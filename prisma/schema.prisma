@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // For Supabase connection pooling, uncomment the line below and use port 6543 for DATABASE_URL
+  // directUrl = env("DIRECT_URL")
+}
+
+enum Plan {
+  FREE
+  PRO
+  BUSINESS
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+model User {
+  id                 String             @id @default(cuid())
+  clerkId            String             @unique
+  email              String             @unique
+  stripeCustomerId   String?            @unique
+  subscriptionId     String?
+  plan               Plan               @default(FREE)
+  subscriptionStatus SubscriptionStatus @default(INACTIVE)
+  // Usage tracking — resets monthly
+  monthlyUsage       Int                @default(0)
+  usageResetDate     DateTime           @default(now())
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  analyses           Analysis[]
+
+  @@index([clerkId])
+  @@index([stripeCustomerId])
+}
+
+model Analysis {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mode      String   // freelancer | tenant | founder | employment | general
+  inputHash String?  // optional SHA-256 of input for dedup
+  results   Json     // array of ClauseResult
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
