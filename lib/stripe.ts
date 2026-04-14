@@ -1,9 +1,20 @@
 import Stripe from "stripe";
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-02-24.acacia",
-  typescript: true,
-});
+// Lazy singleton — only instantiated on first actual request, not at build time.
+// This prevents Next.js static analysis from failing when STRIPE_SECRET_KEY is absent.
+let _stripe: Stripe | undefined;
+
+export function getStripe(): Stripe {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) throw new Error("STRIPE_SECRET_KEY environment variable is not set.");
+    _stripe = new Stripe(key, {
+      apiVersion: "2025-02-24.acacia",
+      typescript: true,
+    });
+  }
+  return _stripe;
+}
 
 export const PLANS = {
   FREE: {
@@ -20,7 +31,7 @@ export const PLANS = {
   PRO: {
     name: "Pro",
     price: 19,
-    priceId: process.env.STRIPE_PRO_PRICE_ID!,
+    priceId: process.env.STRIPE_PRO_PRICE_ID ?? "",
     analyses: Infinity,
     features: [
       "Unlimited contract analyses",
@@ -32,7 +43,7 @@ export const PLANS = {
   BUSINESS: {
     name: "Business",
     price: 49,
-    priceId: process.env.STRIPE_BUSINESS_PRICE_ID!,
+    priceId: process.env.STRIPE_BUSINESS_PRICE_ID ?? "",
     analyses: Infinity,
     features: [
       "Everything in Pro",
