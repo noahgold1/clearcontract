@@ -7,6 +7,22 @@ import { AUDIENCE_MODES, type AudienceMode, type ClauseResult } from "@/lib/prom
 
 type InputMethod = "paste" | "upload";
 
+function SkeletonCard() {
+  return (
+    <div className="rounded-xl border border-white/[0.07] bg-[#111116] p-5 animate-pulse space-y-3">
+      <div className="flex justify-between">
+        <div className="h-3.5 w-2/5 bg-white/[0.07] rounded" />
+        <div className="h-5 w-16 bg-white/[0.07] rounded-full" />
+      </div>
+      <div className="space-y-2">
+        <div className="h-2.5 w-full bg-white/[0.05] rounded" />
+        <div className="h-2.5 w-5/6 bg-white/[0.05] rounded" />
+        <div className="h-2.5 w-4/6 bg-white/[0.05] rounded" />
+      </div>
+    </div>
+  );
+}
+
 export function ContractAnalyzer() {
   const [inputMethod, setInputMethod] = useState<InputMethod>("paste");
   const [text, setText] = useState("");
@@ -16,6 +32,7 @@ export function ContractAnalyzer() {
   const [error, setError] = useState<string | null>(null);
   const [clauses, setClauses] = useState<ClauseResult[] | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,29 +57,31 @@ export function ContractAnalyzer() {
 
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "Something went wrong.");
+        setError(data.error ?? "Something went wrong. Please try again.");
         return;
       }
       setClauses(data.clauses);
+      // Scroll to results smoothly
+      setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
     } catch {
-      setError("Network error. Please try again.");
+      setError("Network error. Check your connection and try again.");
     } finally {
       setLoading(false);
     }
   }
 
-  const riskCount = clauses?.filter((c) => c.status === "risk").length ?? 0;
-  const unusualCount = clauses?.filter((c) => c.status === "unusual").length ?? 0;
+  const riskCount     = clauses?.filter((c) => c.status === "risk").length ?? 0;
+  const unusualCount  = clauses?.filter((c) => c.status === "unusual").length ?? 0;
   const standardCount = clauses?.filter((c) => c.status === "standard").length ?? 0;
 
   return (
     <div className="space-y-5">
-      {/* Form card */}
+      {/* Form */}
       <form onSubmit={handleSubmit} className="bg-[#111116] border border-white/[0.07] rounded-2xl p-6 space-y-6">
 
         {/* Mode selector */}
         <div>
-          <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">
+          <label className="block text-[11px] font-semibold text-zinc-500 uppercase tracking-widest mb-3">
             Audience Mode
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
@@ -86,9 +105,9 @@ export function ContractAnalyzer() {
           </div>
         </div>
 
-        {/* Input method toggle */}
+        {/* Input method */}
         <div>
-          <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">
+          <label className="block text-[11px] font-semibold text-zinc-500 uppercase tracking-widest mb-3">
             Contract Input
           </label>
           <div className="flex gap-1 bg-white/[0.04] border border-white/[0.07] rounded-lg p-1 w-fit mb-4">
@@ -134,7 +153,15 @@ export function ContractAnalyzer() {
                   <p className="font-medium text-zinc-200 text-sm">{file.name}</p>
                   <p className="text-zinc-600 text-xs">
                     {(file.size / 1024).toFixed(1)} KB —{" "}
-                    <button type="button" onClick={(e) => { e.stopPropagation(); setFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }} className="text-red-400 hover:text-red-300 transition-colors">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setFile(null);
+                        if (fileInputRef.current) fileInputRef.current.value = "";
+                      }}
+                      className="text-red-400 hover:text-red-300 transition-colors"
+                    >
                       Remove
                     </button>
                   </p>
@@ -154,7 +181,7 @@ export function ContractAnalyzer() {
         <button
           type="submit"
           disabled={loading || (inputMethod === "paste" ? !text.trim() : !file)}
-          className="w-full bg-indigo-500 hover:bg-indigo-400 disabled:bg-indigo-500/30 disabled:text-indigo-300/50 text-white font-semibold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 flex items-center justify-center gap-2"
+          className="w-full bg-indigo-500 hover:bg-indigo-400 disabled:bg-indigo-500/30 disabled:text-indigo-300/40 text-white font-semibold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 flex items-center justify-center gap-2"
         >
           {loading ? (
             <>
@@ -165,23 +192,43 @@ export function ContractAnalyzer() {
               Analyzing with Claude AI...
             </>
           ) : (
-            "Analyze Contract"
+            <>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              Analyze Contract
+            </>
           )}
         </button>
       </form>
 
       {/* Error */}
       {error && (
-        <div className="bg-red-500/[0.08] border border-red-500/20 rounded-xl p-4 flex gap-3">
-          <span className="text-red-400 shrink-0">✗</span>
-          <p className="text-red-300 text-sm">{error}</p>
+        <div className="bg-red-500/[0.08] border border-red-500/20 rounded-xl p-4 flex gap-3 items-start">
+          <span className="text-red-400 shrink-0 mt-0.5">✗</span>
+          <p className="text-red-300 text-sm leading-relaxed">{error}</p>
+        </div>
+      )}
+
+      {/* Loading skeletons */}
+      {loading && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 py-2">
+            <div className="w-2 h-2 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.3s]" />
+            <div className="w-2 h-2 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.15s]" />
+            <div className="w-2 h-2 rounded-full bg-indigo-400 animate-bounce" />
+            <span className="text-zinc-500 text-sm">Reading your contract...</span>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
+          </div>
         </div>
       )}
 
       {/* Results */}
       {clauses && clauses.length > 0 && (
-        <div className="space-y-5">
-          <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="space-y-5" ref={resultsRef}>
+          <div className="flex items-center justify-between flex-wrap gap-3 pt-1">
             <div>
               <h2 className="text-lg font-bold text-white">Analysis Results</h2>
               <div className="flex items-center gap-4 mt-1.5 text-xs font-medium">
@@ -200,9 +247,7 @@ export function ContractAnalyzer() {
           </div>
 
           <div className="grid sm:grid-cols-2 gap-3">
-            {clauses.map((clause, i) => (
-              <ClauseCard key={i} clause={clause} />
-            ))}
+            {clauses.map((clause, i) => <ClauseCard key={i} clause={clause} />)}
           </div>
 
           <p className="text-xs text-zinc-700 text-center pt-2">

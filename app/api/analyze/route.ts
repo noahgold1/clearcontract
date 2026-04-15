@@ -3,9 +3,13 @@ import Anthropic from "@anthropic-ai/sdk";
 import { buildSystemPrompt, type AudienceMode, type ClauseResult } from "@/lib/prompts";
 import { extractTextFromPDF, truncateToTokenLimit } from "@/lib/pdf-utils";
 
+export const maxDuration = 60; // Vercel max for hobby plan
+
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 });
+
+const VALID_MODES: AudienceMode[] = ["freelancer", "tenant", "founder", "employment", "general"];
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,11 +19,16 @@ export async function POST(req: NextRequest) {
 
     if (contentType.includes("multipart/form-data")) {
       const formData = await req.formData();
-      mode = (formData.get("mode") as AudienceMode) ?? "general";
+      const rawMode = formData.get("mode") as string;
+      mode = VALID_MODES.includes(rawMode as AudienceMode) ? (rawMode as AudienceMode) : "general";
+
       const file = formData.get("file") as File | null;
       const pastedText = formData.get("text") as string | null;
 
       if (file && file.size > 0) {
+        if (file.size > 10 * 1024 * 1024) {
+          return NextResponse.json({ error: "File too large. Maximum size is 10MB." }, { status: 400 });
+        }
         const buffer = Buffer.from(await file.arrayBuffer());
         contractText = await extractTextFromPDF(buffer);
       } else if (pastedText) {
@@ -27,15 +36,18 @@ export async function POST(req: NextRequest) {
       }
     } else {
       const body = await req.json();
-      mode = body.mode ?? "general";
+      const rawMode = body.mode as string;
+      mode = VALID_MODES.includes(rawMode as AudienceMode) ? (rawMode as AudienceMode) : "general";
       contractText = body.text ?? "";
     }
 
-    if (!contractText.trim()) {
-      return NextResponse.json(
-        { error: "No contract text provided." },
-        { status: 400 }
-      );
+    contractText = contractText.trim();
+
+    if (!contractText) {
+      return NextResponse.json({ error: "No contract text provided." }, { status: 400 });
+    }
+    if (contractText.length < 50) {
+      return NextResponse.json({ error: "Contract text is too short to analyze." }, { status: 400 });
     }
 
     const truncated = truncateToTokenLimit(contractText);
@@ -48,15 +60,14 @@ export async function POST(req: NextRequest) {
       messages: [
         {
           role: "user",
-          content: `Here is the contract to analyze:\n\n${truncated}`,
+          content: `Analyze the following contract and return ONLY a JSON array as specified:\n\n${truncated}`,
         },
       ],
     });
 
-    const rawText =
-      message.content[0].type === "text" ? message.content[0].text : "";
+    const rawText = message.content[0].type === "text" ? message.content[0].text : "";
 
-    // Strip any accidental markdown fences before parsing
+    // Strip any accidental markdown fences
     const cleaned = rawText
       .replace(/^```(?:json)?\s*/i, "")
       .replace(/\s*```$/i, "")
@@ -64,18 +75,41 @@ export async function POST(req: NextRequest) {
 
     let clauses: ClauseResult[];
     try {
-      clauses = JSON.parse(cleaned);
-      if (!Array.isArray(clauses)) throw new Error("Not an array");
+      const parsed = JSON.parse(cleaned);
+      if (!Array.isArray(parsed)) throw new Error("Response was not an array");
+      // Validate and sanitize each clause
+      clauses = parsed
+        .filter((c) => c && typeof c === "object" && c.title && c.plain)
+        .map((c) => ({
+          title: String(c.title).slice(0, 200),
+          plain: String(c.plain).slice(0, 1000),
+          status: ["standard", "unusual", "risk"].includes(c.status) ? c.status : "standard",
+          flag: c.flag ? String(c.flag).slice(0, 500) : null,
+        }));
     } catch {
+      console.error("[analyze] JSON parse failed. Raw:", rawText.slice(0, 500));
       return NextResponse.json(
-        { error: "Failed to parse AI response. Please try again." },
+        { error: "The AI returned an unexpected format. Please try again." },
         { status: 502 }
+      );
+    }
+
+    if (clauses.length === 0) {
+      return NextResponse.json(
+        { error: "No clauses were found. Please check that the input is a real contract." },
+        { status: 422 }
       );
     }
 
     return NextResponse.json({ clauses });
   } catch (err: unknown) {
     console.error("[analyze] error:", err);
+
+    if (err instanceof Anthropic.APIError) {
+      if (err.status === 401) return NextResponse.json({ error: "AI service configuration error." }, { status: 500 });
+      if (err.status === 429) return NextResponse.json({ error: "Too many requests. Please wait a moment and try again." }, { status: 429 });
+    }
+
     const message = err instanceof Error ? err.message : "Internal server error";
     return NextResponse.json({ error: message }, { status: 500 });
   }
