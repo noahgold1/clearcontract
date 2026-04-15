@@ -1,17 +1,71 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+const APP_URL = "https://clearcontract-two.vercel.app";
+
 export const metadata: Metadata = {
-  title: "ClearContract — Plain-English Contract Explainer",
-  description:
-    "Paste any contract and get a plain-English breakdown of every clause in seconds, powered by AI. Know what you're signing.",
-  keywords: ["contract analysis", "legal AI", "plain english contract", "contract explainer"],
-  openGraph: {
-    title: "ClearContract — Know What You're Signing",
-    description:
-      "AI-powered contract analysis that explains every clause in plain English.",
-    type: "website",
+  metadataBase: new URL(APP_URL),
+  title: {
+    default: "ClearContract — AI Contract Analyzer | Understand What You're Signing",
+    template: "%s | ClearContract",
   },
+  description:
+    "ClearContract uses Claude AI to analyze any contract in seconds. Get plain-English explanations of every clause, flag risky terms, and know exactly what you're agreeing to before you sign.",
+  keywords: [
+    "AI contract analyzer",
+    "contract analysis tool",
+    "plain English contract explainer",
+    "legal document analyzer",
+    "freelance contract review",
+    "understand contract clauses",
+    "contract risk detection",
+    "AI legal tool",
+    "contract checker",
+    "employment contract analyzer",
+  ],
+  authors: [{ name: "ClearContract" }],
+  creator: "ClearContract",
+  publisher: "ClearContract",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: APP_URL,
+    siteName: "ClearContract",
+    title: "ClearContract — Understand Any Contract in Seconds",
+    description:
+      "AI-powered contract analysis. Paste any contract and get a plain-English breakdown of every clause, risk flags, and actionable insights — powered by Claude AI.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "ClearContract — AI Contract Analyzer",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ClearContract — Understand Any Contract in Seconds",
+    description:
+      "Paste any contract. Get plain-English explanations of every clause. Flag risks instantly. Powered by Claude AI.",
+    images: ["/og-image.png"],
+    creator: "@clearcontract",
+  },
+  alternates: {
+    canonical: APP_URL,
+  },
+  category: "technology",
 };
 
 export default function RootLayout({
@@ -21,6 +75,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+      </head>
       <body>{children}</body>
     </html>
   );

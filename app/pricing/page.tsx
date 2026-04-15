@@ -1,6 +1,16 @@
+import type { Metadata } from "next";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { PricingTable } from "@/components/PricingTable";
+
+export const metadata: Metadata = {
+  title: "Pricing",
+  description:
+    "ClearContract pricing — start free with no account required. Upgrade for unlimited contract analyses, PDF exports, and priority processing.",
+  alternates: {
+    canonical: "https://clearcontract-two.vercel.app/pricing",
+  },
+};
 
 export default function PricingPage() {
   return (

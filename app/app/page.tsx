@@ -1,6 +1,16 @@
+import type { Metadata } from "next";
 import { ContractAnalyzer } from "@/components/ContractAnalyzer";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+
+export const metadata: Metadata = {
+  title: "Analyze a Contract",
+  description:
+    "Paste your contract or upload a PDF. ClearContract uses Claude AI to explain every clause in plain English and flag anything risky — in seconds.",
+  alternates: {
+    canonical: "https://clearcontract-two.vercel.app/app",
+  },
+};
 
 export default function AppPage() {
   return (

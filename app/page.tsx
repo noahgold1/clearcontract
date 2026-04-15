@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -5,9 +6,113 @@ import { PricingTable } from "@/components/PricingTable";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { HeroPreview } from "@/components/HeroPreview";
 
+const APP_URL = "https://clearcontract-two.vercel.app";
+
+export const metadata: Metadata = {
+  alternates: { canonical: APP_URL },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": `${APP_URL}/#webapp`,
+      name: "ClearContract",
+      url: APP_URL,
+      description:
+        "AI-powered contract analysis tool. Paste any contract and instantly get plain-English explanations of every clause, risk flags, and key insights — powered by Claude AI.",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+        availability: "https://schema.org/InStock",
+        description: "Free to use, no account required",
+      },
+      featureList: [
+        "Plain-English contract clause explanations",
+        "Risk detection and flagging",
+        "PDF upload support",
+        "5 audience modes: freelancer, employee, business, tenant, general",
+        "Downloadable PDF report",
+        "Powered by Claude AI",
+      ],
+    },
+    {
+      "@type": "Organization",
+      "@id": `${APP_URL}/#org`,
+      name: "ClearContract",
+      url: APP_URL,
+      logo: {
+        "@type": "ImageObject",
+        url: `${APP_URL}/icon.svg`,
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${APP_URL}/#website`,
+      url: APP_URL,
+      name: "ClearContract",
+      description: "Understand any contract in seconds with AI",
+      publisher: { "@id": `${APP_URL}/#org` },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: `${APP_URL}/app`,
+        },
+        "query-input": "required name=contract_text",
+      },
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: "What is ClearContract?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "ClearContract is an AI-powered contract analysis tool that reads any contract and explains every clause in plain English. It flags risky terms, unusual provisions, and tells you exactly what you're agreeing to before you sign.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Is ClearContract free to use?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Yes, ClearContract is free to use with no account required. Simply paste your contract text or upload a PDF and get an instant AI analysis.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "What types of contracts can ClearContract analyze?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "ClearContract can analyze any type of contract including employment agreements, freelance contracts, rental leases, business contracts, NDAs, service agreements, and more.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Is this legal advice?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "No. ClearContract is an informational tool to help you understand contract language. It is not legal advice. For important legal matters, always consult a qualified attorney.",
+          },
+        },
+      ],
+    },
+  ],
+};
+
 export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#09090b] overflow-x-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Navbar />
 
       {/* ─── HERO ─────────────────────────────────────────────────────── */}
