@@ -55,7 +55,15 @@ export default function PricingPage() {
                 },
                 {
                   q: "When do free tier credits reset?",
-                  a: "Free tier credits reset on the first of each calendar month. Unused credits do not roll over.",
+                  a: "Free tier credits reset on the first of each calendar month. Unused credits do not roll over to the next month.",
+                },
+                {
+                  q: "What's the difference between Free and Pro?",
+                  a: "Free gives you 3 analyses per month with contracts up to 10,000 words (~15 pages). Pro removes both limits — unlimited analyses on contracts up to 75,000 words (~115 pages), priority processing, branded PDFs without our footer watermark, and 90 days of saved history.",
+                },
+                {
+                  q: "What does Business unlock that Pro doesn't?",
+                  a: "Business adds team collaboration features: 5 user seats, side-by-side contract comparison, bulk analysis (10 contracts at once), annotated PDFs with clause highlights, custom audience mode prompts your team can save, Slack notifications, and a 4-hour priority support SLA.",
                 },
                 {
                   q: "Is this actually legal advice?",
@@ -63,11 +71,15 @@ export default function PricingPage() {
                 },
                 {
                   q: "Can I cancel my subscription?",
-                  a: "Yes, anytime. You'll keep access until the end of your billing period. Use the billing portal to manage or cancel.",
+                  a: "Yes, anytime. You'll keep access until the end of your billing period. Use the billing portal to manage or cancel — no questions asked, and we offer a 14-day money-back guarantee on all paid plans.",
                 },
                 {
                   q: "What file types are supported?",
-                  a: "Text paste and PDF uploads are supported. PDFs must contain selectable text (not scanned images). Word document support is coming soon.",
+                  a: "Text paste and PDF uploads on all plans (including Free). PDFs must contain selectable text (not scanned images). Word document and Google Docs support is coming soon to Pro and Business.",
+                },
+                {
+                  q: "Do you store my contracts?",
+                  a: "Free and Pro: contracts are processed in-memory and never stored on our servers — only your analysis history is saved (Pro only, 90 days). Business: same as Pro, plus optional team-shared cloud storage if enabled.",
                 },
               ].map(({ q, a }) => (
                 <div

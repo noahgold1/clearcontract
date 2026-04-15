@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Check, ArrowRight } from "lucide-react";
 import { PLANS } from "@/lib/stripe";
 
 export function PricingTable() {
@@ -63,8 +64,8 @@ export function PricingTable() {
               key={plan.key}
               className={`relative rounded-2xl p-7 flex flex-col transition-all ${
                 isPopular
-                  ? "bg-indigo-500/10 border border-indigo-500/40 shadow-xl shadow-indigo-500/10"
-                  : "bg-[#111116] border border-white/[0.07] hover:border-white/[0.12]"
+                  ? "bg-indigo-500/[0.08] border border-indigo-500/40 shadow-xl shadow-indigo-500/10 md:scale-[1.02]"
+                  : "bg-zinc-900/50 border border-white/[0.07] hover:border-white/[0.15]"
               }`}
             >
               {isPopular && (
@@ -75,45 +76,105 @@ export function PricingTable() {
                 </div>
               )}
 
+              {/* Plan name + tagline */}
               <div className="mb-6">
-                <h3 className={`text-base font-semibold mb-4 ${isPopular ? "text-indigo-300" : "text-zinc-400"}`}>
+                <h3
+                  className={`text-base font-semibold mb-1 ${
+                    isPopular ? "text-indigo-300" : "text-white"
+                  }`}
+                >
                   {plan.name}
                 </h3>
+                <p className="text-xs text-zinc-500 mb-5">{plan.tagline}</p>
+
+                {/* Price */}
                 <div className="flex items-end gap-1.5">
-                  <span className="text-4xl font-black text-white">${plan.price}</span>
-                  {plan.price > 0 && <span className="text-zinc-500 text-sm mb-1.5">/month</span>}
+                  <span className="text-5xl font-black text-white tracking-tight">
+                    ${plan.price}
+                  </span>
+                  {plan.price > 0 ? (
+                    <span className="text-zinc-500 text-sm mb-2">/month</span>
+                  ) : (
+                    <span className="text-zinc-500 text-sm mb-2">forever</span>
+                  )}
                 </div>
+                {plan.price > 0 && (
+                  <p className="text-[11px] text-zinc-600 mt-1">Billed monthly · cancel anytime</p>
+                )}
               </div>
 
-              <ul className="space-y-3 mb-8 flex-1">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2.5 text-sm">
-                    <svg className={`w-4 h-4 mt-0.5 shrink-0 ${isPopular ? "text-indigo-400" : "text-zinc-500"}`} fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className={isPopular ? "text-zinc-200" : "text-zinc-400"}>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
+              {/* CTA button — moved up for visibility */}
               <button
                 onClick={() => handleCheckout(plan.priceId, plan.key)}
                 disabled={loading === plan.key}
-                className={`w-full py-2.5 px-5 rounded-xl font-semibold text-sm transition-all disabled:opacity-50 ${
+                className={`w-full py-3 px-5 rounded-xl font-semibold text-sm transition-all disabled:opacity-50 mb-6 inline-flex items-center justify-center gap-2 group ${
                   isPopular
                     ? "bg-indigo-500 hover:bg-indigo-400 text-white shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50"
                     : "bg-white/[0.06] hover:bg-white/[0.1] text-white border border-white/[0.08]"
                 }`}
               >
-                {loading === plan.key
-                  ? "Redirecting..."
-                  : plan.key === "FREE"
-                  ? "Get started free"
-                  : `Get ${plan.name}`}
+                {loading === plan.key ? (
+                  "Redirecting..."
+                ) : (
+                  <>
+                    {plan.cta}
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                  </>
+                )}
               </button>
+
+              {/* Divider */}
+              <div className="border-t border-white/[0.05] mb-5" />
+
+              {/* Features */}
+              <ul className="space-y-3 flex-1">
+                {plan.features.map((feature, idx) => {
+                  // "Everything in Pro, plus:" gets special styling
+                  const isHeader = feature.endsWith("plus:");
+                  if (isHeader) {
+                    return (
+                      <li
+                        key={feature}
+                        className="text-xs font-semibold uppercase tracking-wider text-indigo-400 -mb-1"
+                      >
+                        {feature}
+                      </li>
+                    );
+                  }
+                  return (
+                    <li key={feature + idx} className="flex items-start gap-2.5 text-sm">
+                      <Check
+                        className={`w-4 h-4 mt-0.5 shrink-0 ${
+                          isPopular ? "text-indigo-400" : "text-emerald-500"
+                        }`}
+                        strokeWidth={3}
+                      />
+                      <span className={isPopular ? "text-zinc-200" : "text-zinc-400"}>
+                        {feature}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
           );
         })}
+      </div>
+
+      {/* Money-back / trust footer */}
+      <div className="flex items-center justify-center gap-6 pt-6 text-xs text-zinc-600 flex-wrap">
+        <span className="flex items-center gap-1.5">
+          <Check className="w-3.5 h-3.5 text-emerald-500" strokeWidth={3} />
+          14-day money-back guarantee
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Check className="w-3.5 h-3.5 text-emerald-500" strokeWidth={3} />
+          Cancel anytime, no questions asked
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Check className="w-3.5 h-3.5 text-emerald-500" strokeWidth={3} />
+          Secure payment via Stripe
+        </span>
       </div>
     </div>
   );
