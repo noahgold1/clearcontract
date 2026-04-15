@@ -6,6 +6,7 @@ import { DownloadPDF } from "./DownloadPDF";
 import { AUDIENCE_MODES, type AudienceMode, type ClauseResult } from "@/lib/prompts";
 
 type InputMethod = "paste" | "upload";
+type FilterStatus = "all" | "risk" | "unusual" | "standard";
 
 function SkeletonCard() {
   return (
@@ -31,6 +32,7 @@ export function ContractAnalyzer() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [clauses, setClauses] = useState<ClauseResult[] | null>(null);
+  const [filter, setFilter] = useState<FilterStatus>("all");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
@@ -38,6 +40,7 @@ export function ContractAnalyzer() {
     e.preventDefault();
     setError(null);
     setClauses(null);
+    setFilter("all");
     setLoading(true);
 
     try {
@@ -61,7 +64,6 @@ export function ContractAnalyzer() {
         return;
       }
       setClauses(data.clauses);
-      // Scroll to results smoothly
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
     } catch {
       setError("Network error. Check your connection and try again.");
@@ -73,6 +75,19 @@ export function ContractAnalyzer() {
   const riskCount     = clauses?.filter((c) => c.status === "risk").length ?? 0;
   const unusualCount  = clauses?.filter((c) => c.status === "unusual").length ?? 0;
   const standardCount = clauses?.filter((c) => c.status === "standard").length ?? 0;
+  const totalCount    = clauses?.length ?? 0;
+
+  const filteredClauses = clauses?.filter((c) => filter === "all" || c.status === filter) ?? [];
+
+  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+  const charCount = text.length;
+
+  const filterTabs: { key: FilterStatus; label: string; count: number; color: string; active: string }[] = [
+    { key: "all",      label: "All",      count: totalCount,    color: "text-zinc-400",   active: "bg-white/[0.08] text-white border-white/[0.15]" },
+    { key: "risk",     label: "Risk",     count: riskCount,     color: "text-red-400",    active: "bg-red-500/10 text-red-300 border-red-500/30" },
+    { key: "unusual",  label: "Unusual",  count: unusualCount,  color: "text-amber-400",  active: "bg-amber-500/10 text-amber-300 border-amber-500/30" },
+    { key: "standard", label: "Standard", count: standardCount, color: "text-emerald-400",active: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30" },
+  ];
 
   return (
     <div className="space-y-5">
@@ -81,8 +96,8 @@ export function ContractAnalyzer() {
 
         {/* Mode selector */}
         <div>
-          <label className="block text-[11px] font-semibold text-zinc-500 uppercase tracking-widest mb-3">
-            Audience Mode
+          <label className="block text-[11px] font-semibold text-zinc-500 uppercase tracking-widest mb-3 font-mono-brand">
+            // audience_mode
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
             {(Object.entries(AUDIENCE_MODES) as [AudienceMode, typeof AUDIENCE_MODES[AudienceMode]][]).map(
@@ -107,8 +122,8 @@ export function ContractAnalyzer() {
 
         {/* Input method */}
         <div>
-          <label className="block text-[11px] font-semibold text-zinc-500 uppercase tracking-widest mb-3">
-            Contract Input
+          <label className="block text-[11px] font-semibold text-zinc-500 uppercase tracking-widest mb-3 font-mono-brand">
+            // contract_input
           </label>
           <div className="flex gap-1 bg-white/[0.04] border border-white/[0.07] rounded-lg p-1 w-fit mb-4">
             {(["paste", "upload"] as const).map((method) => (
@@ -128,13 +143,25 @@ export function ContractAnalyzer() {
           </div>
 
           {inputMethod === "paste" ? (
-            <textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="Paste your contract text here..."
-              className="w-full h-52 px-4 py-3 rounded-xl bg-[#0d0d11] border border-white/[0.07] text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 resize-none transition-colors"
-              required={inputMethod === "paste"}
-            />
+            <div className="relative">
+              <textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Paste your contract text here..."
+                className="w-full h-52 px-4 py-3 rounded-xl bg-[#0d0d11] border border-white/[0.07] text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 resize-none transition-colors pb-8"
+                required={inputMethod === "paste"}
+              />
+              {/* Word/char counter */}
+              <div className="absolute bottom-2.5 right-3 flex items-center gap-2 pointer-events-none">
+                {charCount > 0 && (
+                  <>
+                    <span className="text-[10px] text-zinc-600 font-mono-brand">{wordCount.toLocaleString()} words</span>
+                    <span className="text-zinc-700">·</span>
+                    <span className="text-[10px] text-zinc-600 font-mono-brand">{charCount.toLocaleString()} chars</span>
+                  </>
+                )}
+              </div>
+            </div>
           ) : (
             <div
               onClick={() => fileInputRef.current?.click()}
@@ -181,7 +208,7 @@ export function ContractAnalyzer() {
         <button
           type="submit"
           disabled={loading || (inputMethod === "paste" ? !text.trim() : !file)}
-          className="w-full bg-indigo-500 hover:bg-indigo-400 disabled:bg-indigo-500/30 disabled:text-indigo-300/40 text-white font-semibold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 flex items-center justify-center gap-2"
+          className="w-full bg-indigo-500 hover:bg-indigo-400 disabled:bg-indigo-500/30 disabled:text-indigo-300/40 text-white font-semibold py-3.5 rounded-xl text-sm transition-all btn-glow flex items-center justify-center gap-2"
         >
           {loading ? (
             <>
@@ -228,9 +255,13 @@ export function ContractAnalyzer() {
       {/* Results */}
       {clauses && clauses.length > 0 && (
         <div className="space-y-5" ref={resultsRef}>
-          <div className="flex items-center justify-between flex-wrap gap-3 pt-1">
+          {/* Results header */}
+          <div className="flex items-start justify-between flex-wrap gap-3 pt-1">
             <div>
-              <h2 className="text-lg font-bold text-white">Analysis Results</h2>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-widest font-mono-brand">// results</span>
+              </div>
+              <h2 className="text-xl font-bold text-white font-display">Analysis Complete</h2>
               <div className="flex items-center gap-4 mt-1.5 text-xs font-medium">
                 <span className="flex items-center gap-1.5 text-emerald-400">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />{standardCount} standard
@@ -246,9 +277,36 @@ export function ContractAnalyzer() {
             <DownloadPDF clauses={clauses} mode={mode} />
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-3">
-            {clauses.map((clause, i) => <ClauseCard key={i} clause={clause} />)}
+          {/* Filter tabs */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {filterTabs.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setFilter(tab.key)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all ${
+                  filter === tab.key
+                    ? tab.active
+                    : "border-white/[0.07] text-zinc-500 hover:border-white/[0.12] hover:text-zinc-300"
+                }`}
+              >
+                {tab.label}
+                <span className={`text-[10px] font-bold tabular-nums ${filter === tab.key ? "" : "text-zinc-600"}`}>
+                  {tab.count}
+                </span>
+              </button>
+            ))}
           </div>
+
+          {/* Clause grid */}
+          {filteredClauses.length > 0 ? (
+            <div className="grid sm:grid-cols-2 gap-3">
+              {filteredClauses.map((clause, i) => <ClauseCard key={i} clause={clause} />)}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-zinc-600 text-sm">
+              No {filter} clauses found.
+            </div>
+          )}
 
           <p className="text-xs text-zinc-700 text-center pt-2">
             For informational purposes only. Not legal advice. Consult a qualified attorney for legal matters.
