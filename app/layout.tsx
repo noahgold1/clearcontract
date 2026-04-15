@@ -66,6 +66,9 @@ export const metadata: Metadata = {
     canonical: APP_URL,
   },
   category: "technology",
+  verification: {
+    google: "TgpV7EfC2D9IA_KBUkNx7yM8IRVZ9c3MHG9NdpKDEuQ",
+  },
 };
 
 export default function RootLayout({
