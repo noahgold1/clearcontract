@@ -15,8 +15,11 @@ export function PricingTable() {
       router.push("/app");
       return;
     }
+
+    // Stripe isn't wired up yet in this environment — route to the free app
+    // with a friendly notice instead of leaving the click dead.
     if (!priceId) {
-      setError("Payments are not configured yet. Check back soon.");
+      router.push(`/app?upgrade=${planKey.toLowerCase()}`);
       return;
     }
 
@@ -33,7 +36,8 @@ export function PricingTable() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        setError(data.error ?? "Something went wrong. Please try again.");
+        // Stripe not configured server-side — same graceful fallback.
+        router.push(`/app?upgrade=${planKey.toLowerCase()}`);
       }
     } catch {
       setError("Network error. Please try again.");

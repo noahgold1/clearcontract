@@ -56,13 +56,13 @@ export function LandingHero() {
           </motion.div>
 
           {/* Headline — character reveal */}
-          <h1 className="font-display text-5xl md:text-[68px] leading-[1.02] font-bold tracking-tight mb-6">
+          <h1 className="font-display text-[40px] sm:text-5xl md:text-[64px] leading-[1.08] md:leading-[1.05] font-bold tracking-tight mb-6 break-words">
             <CharacterReveal text="Know exactly" className="text-white" />
             <br />
             <CharacterReveal
               text="what you're signing"
               delay={0.3}
-              className="text-indigo-300 [text-shadow:_0_0_30px_rgba(129,140,248,0.4)]"
+              className="text-indigo-300"
             />
           </h1>
 

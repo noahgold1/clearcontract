@@ -76,7 +76,7 @@ export function CharacterReveal({
 }) {
   return (
     <motion.span
-      className={cn("inline-block", className)}
+      className={cn("inline", className)}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
@@ -93,7 +93,10 @@ export function CharacterReveal({
       }
     >
       {text.split(" ").map((word, wi) => (
-        <span key={wi} className="inline-block whitespace-nowrap">
+        // Each word stays together (inline-block, no whitespace-nowrap so it
+        // can wrap to a new line if the viewport is narrow) and is followed
+        // by a regular space so browsers can break between words naturally.
+        <span key={wi} className="inline-block">
           {word.split("").map((char, ci) => (
             <motion.span
               key={ci}
@@ -117,7 +120,7 @@ export function CharacterReveal({
               {char}
             </motion.span>
           ))}
-          {wi < text.split(" ").length - 1 && "\u00A0"}
+          {wi < text.split(" ").length - 1 && " "}
         </span>
       ))}
     </motion.span>

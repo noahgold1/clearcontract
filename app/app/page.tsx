@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { ContractAnalyzer } from "@/components/ContractAnalyzer";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { UpgradeBanner } from "@/components/UpgradeBanner";
 
 export const metadata: Metadata = {
   title: "Analyze a Contract",
@@ -32,6 +34,11 @@ export default function AppPage() {
               Paste your contract or upload a PDF. Claude AI breaks every clause into plain English, flags risks, and tells you what to watch out for.
             </p>
           </div>
+
+          {/* Upgrade banner (shown when routed from pricing page) */}
+          <Suspense fallback={null}>
+            <UpgradeBanner />
+          </Suspense>
 
           {/* Disclaimer */}
           <div className="bg-amber-500/[0.07] border border-amber-500/20 rounded-xl px-5 py-3 mb-8 flex items-start gap-3">

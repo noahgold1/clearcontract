@@ -35,7 +35,7 @@ export function SectionHeading({
           text={headingBottomGradient}
           delay={0.15}
           as="span"
-          className="text-indigo-300 [text-shadow:_0_0_40px_rgba(129,140,248,0.35)]"
+          className="text-indigo-300"
         />
       </h2>
 
