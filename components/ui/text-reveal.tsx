@@ -92,24 +92,33 @@ export function CharacterReveal({
         } satisfies Variants
       }
     >
-      {text.split("").map((char, i) => (
-        <motion.span
-          key={i}
-          className="inline-block"
-          variants={
-            {
-              hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
-              visible: {
-                opacity: 1,
-                y: 0,
-                filter: "blur(0px)",
-                transition: { type: "spring" as const, damping: 15, stiffness: 200 },
-              },
-            } satisfies Variants
-          }
-        >
-          {char === " " ? "\u00A0" : char}
-        </motion.span>
+      {text.split(" ").map((word, wi) => (
+        <span key={wi} className="inline-block whitespace-nowrap">
+          {word.split("").map((char, ci) => (
+            <motion.span
+              key={ci}
+              className="inline-block"
+              variants={
+                {
+                  hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    filter: "blur(0px)",
+                    transition: {
+                      type: "spring" as const,
+                      damping: 15,
+                      stiffness: 200,
+                    },
+                  },
+                } satisfies Variants
+              }
+            >
+              {char}
+            </motion.span>
+          ))}
+          {wi < text.split(" ").length - 1 && "\u00A0"}
+        </span>
       ))}
     </motion.span>
   );
