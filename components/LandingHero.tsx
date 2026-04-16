@@ -62,7 +62,7 @@ export function LandingHero() {
             <CharacterReveal
               text="what you're signing"
               delay={0.3}
-              className="bg-gradient-to-br from-indigo-200 via-indigo-400 to-violet-600 bg-clip-text text-transparent"
+              className="text-indigo-300 [text-shadow:_0_0_30px_rgba(129,140,248,0.4)]"
             />
           </h1>
 
