@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { SmoothScroll } from "@/components/ui/smooth-scroll";
+import { ScrollProgress } from "@/components/ui/scroll-progress";
 
 const APP_URL = "https://clearcontract-two.vercel.app";
 
@@ -83,7 +85,11 @@ export default function RootLayout({
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
-      <body>{children}</body>
+      <body>
+        <SmoothScroll />
+        <ScrollProgress />
+        {children}
+      </body>
     </html>
   );
 }
