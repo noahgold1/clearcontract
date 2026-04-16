@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { BorderBeam } from "./ui/border-beam";
 
 export function HeroPreview() {
@@ -115,9 +116,12 @@ export function HeroPreview() {
 
         {/* Bottom bar */}
         <div className="px-3 pb-3 flex items-center gap-2">
-          <button className="flex-1 text-[11px] font-semibold bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 py-1.5 rounded-lg border border-indigo-500/20 transition-colors">
+          <Link
+            href="/app"
+            className="flex-1 text-center text-[11px] font-semibold bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 py-1.5 rounded-lg border border-indigo-500/20 transition-colors"
+          >
             ⬇ Download PDF
-          </button>
+          </Link>
         </div>
       </div>
     </div>

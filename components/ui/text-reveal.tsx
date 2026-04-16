@@ -92,37 +92,44 @@ export function CharacterReveal({
         } satisfies Variants
       }
     >
-      {text.split(" ").map((word, wi) => (
-        // Each word stays together (inline-block, no whitespace-nowrap so it
-        // can wrap to a new line if the viewport is narrow) and is followed
-        // by a regular space so browsers can break between words naturally.
-        <span key={wi} className="inline-block">
-          {word.split("").map((char, ci) => (
-            <motion.span
-              key={ci}
-              className="inline-block"
-              variants={
-                {
-                  hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
-                  visible: {
-                    opacity: 1,
-                    y: 0,
-                    filter: "blur(0px)",
-                    transition: {
-                      type: "spring" as const,
-                      damping: 15,
-                      stiffness: 200,
+      {text.split(" ").map((word, wi, arr) => {
+        const isLast = wi === arr.length - 1;
+        return (
+          <span
+            key={wi}
+            // inline-block keeps the characters of this word together so
+            // they never break mid-word. A right margin (in em units, so it
+            // scales with font size) creates the gap between words, since
+            // adjacent-text-node spaces at inline-block edges are unreliable.
+            className="inline-block"
+            style={{ marginRight: isLast ? 0 : "0.28em" }}
+          >
+            {word.split("").map((char, ci) => (
+              <motion.span
+                key={ci}
+                className="inline-block"
+                variants={
+                  {
+                    hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
+                    visible: {
+                      opacity: 1,
+                      y: 0,
+                      filter: "blur(0px)",
+                      transition: {
+                        type: "spring" as const,
+                        damping: 15,
+                        stiffness: 200,
+                      },
                     },
-                  },
-                } satisfies Variants
-              }
-            >
-              {char}
-            </motion.span>
-          ))}
-          {wi < text.split(" ").length - 1 && " "}
-        </span>
-      ))}
+                  } satisfies Variants
+                }
+              >
+                {char}
+              </motion.span>
+            ))}
+          </span>
+        );
+      })}
     </motion.span>
   );
 }
