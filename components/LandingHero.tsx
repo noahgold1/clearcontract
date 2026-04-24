@@ -49,14 +49,17 @@ export function LandingHero() {
               <AnimatedShinyText className="inline-flex items-center justify-center px-4 py-1.5 transition ease-out hover:text-neutral-200 hover:duration-300">
                 <Sparkles className="w-3.5 h-3.5 mr-2" />
                 <span className="text-xs font-semibold tracking-wide">
-                  Powered by Claude Sonnet 4.5
+                  Powered by Claude Opus 4.7
                 </span>
               </AnimatedShinyText>
             </div>
           </motion.div>
 
-          {/* Headline — character reveal */}
-          <h1 className="font-display text-[40px] sm:text-5xl md:text-[64px] leading-[1.08] md:leading-[1.05] font-bold tracking-tight mb-6 break-words">
+          {/* Headline — character reveal. Leading is intentionally generous
+              (1.15+) because the Syne display font has deep descenders (g, y,
+              p) that got clipped at 1.05. pb-2 gives the last line breathing
+              room so "signing" isn't cut off at the bottom edge. */}
+          <h1 className="font-display text-[40px] sm:text-5xl md:text-[64px] leading-[1.15] md:leading-[1.12] font-bold tracking-tight mb-6 pb-2 break-words">
             <CharacterReveal text="Know exactly" className="text-white" />
             <br />
             <CharacterReveal
