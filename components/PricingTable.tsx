@@ -10,19 +10,14 @@ export function PricingTable() {
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleCheckout(priceId: string | null, planKey: string) {
+  async function handleCheckout(_priceId: string | null, planKey: string) {
     if (planKey === "FREE") {
       router.push("/app");
       return;
     }
 
-    // Stripe isn't wired up yet in this environment — route to the free app
-    // with a friendly notice instead of leaving the click dead.
-    if (!priceId) {
-      router.push(`/app?upgrade=${planKey.toLowerCase()}`);
-      return;
-    }
-
+    // Send planKey to the API — it resolves the real Stripe price ID
+    // server-side from process.env (which the browser can't see).
     setLoading(planKey);
     setError(null);
 
@@ -30,13 +25,14 @@ export function PricingTable() {
       const res = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ priceId }),
+        body: JSON.stringify({ planKey }),
       });
       const data = await res.json();
       if (data.url) {
         window.location.href = data.url;
       } else {
-        // Stripe not configured server-side — same graceful fallback.
+        // Plan genuinely not wired up on the server (missing env var) —
+        // route to the free app with a friendly notice.
         router.push(`/app?upgrade=${planKey.toLowerCase()}`);
       }
     } catch {
