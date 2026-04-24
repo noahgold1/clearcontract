@@ -22,7 +22,7 @@ export default function PricingPage() {
 
           {/* Header */}
           <div className="text-center mb-16">
-            <p className="text-[11px] font-semibold text-indigo-400 uppercase tracking-widest font-mono-brand mb-4">
+            <p className="hidden sm:block text-[11px] font-semibold text-indigo-400 uppercase tracking-widest font-mono-brand mb-4">
               // pricing
             </p>
             <h1 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight font-display">
@@ -40,7 +40,7 @@ export default function PricingPage() {
           {/* FAQ */}
           <div className="mt-24 max-w-3xl mx-auto">
             <div className="text-center mb-10">
-              <p className="text-[11px] font-semibold text-zinc-600 uppercase tracking-widest font-mono-brand mb-3">
+              <p className="hidden sm:block text-[11px] font-semibold text-zinc-600 uppercase tracking-widest font-mono-brand mb-3">
                 // faq
               </p>
               <h2 className="text-2xl font-bold text-white font-display">

@@ -340,7 +340,7 @@ export default function LandingPage() {
               <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/20 via-transparent to-violet-950/20 pointer-events-none" />
 
               <div className="relative z-10">
-                <p className="font-mono-brand text-indigo-400 text-xs tracking-widest mb-6 uppercase">
+                <p className="hidden sm:block font-mono-brand text-indigo-400 text-xs tracking-widest mb-6 uppercase">
                   // get_started
                 </p>
                 <h2 className="font-display text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">

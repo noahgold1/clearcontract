@@ -18,12 +18,14 @@ export function SectionHeading({
 }: SectionHeadingProps) {
   return (
     <div className="text-center mb-16 px-5">
+      {/* Decorative "// section_name" kicker — hidden on mobile where it
+          just eats vertical space without adding signal. */}
       <motion.p
         initial={{ opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
-        className="font-mono-brand text-indigo-400 text-xs tracking-widest mb-4 uppercase"
+        className="hidden sm:block font-mono-brand text-indigo-400 text-xs tracking-widest mb-4 uppercase"
       >
         {kicker}
       </motion.p>

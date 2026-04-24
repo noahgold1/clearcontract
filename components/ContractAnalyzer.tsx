@@ -179,7 +179,7 @@ export function ContractAnalyzer() {
       >
         {/* Mode selector */}
         <div>
-          <label className="block text-[11px] font-semibold text-zinc-500 uppercase tracking-widest mb-3 font-mono-brand">
+          <label className="hidden sm:block text-[11px] font-semibold text-zinc-500 uppercase tracking-widest mb-3 font-mono-brand">
             // audience_mode
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
@@ -208,7 +208,7 @@ export function ContractAnalyzer() {
 
         {/* Input method */}
         <div>
-          <label className="block text-[11px] font-semibold text-zinc-500 uppercase tracking-widest mb-3 font-mono-brand">
+          <label className="hidden sm:block text-[11px] font-semibold text-zinc-500 uppercase tracking-widest mb-3 font-mono-brand">
             // contract_input
           </label>
           <div className="grid grid-cols-3 sm:flex sm:w-fit gap-1 bg-white/[0.04] border border-white/[0.07] rounded-lg p-1 mb-4">
@@ -404,7 +404,7 @@ export function ContractAnalyzer() {
           <div className="flex items-start justify-between flex-wrap gap-3 pt-1">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-widest font-mono-brand">
+                <span className="hidden sm:inline text-[11px] font-semibold text-zinc-500 uppercase tracking-widest font-mono-brand">
                   // results
                 </span>
               </div>

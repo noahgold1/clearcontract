@@ -55,7 +55,7 @@ export default async function AppPage() {
         <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
           <div>
             <div className="flex items-center gap-2 mb-3 flex-wrap">
-              <p className="text-[11px] font-semibold text-indigo-400 uppercase tracking-widest font-mono-brand">
+              <p className="hidden sm:block text-[11px] font-semibold text-indigo-400 uppercase tracking-widest font-mono-brand">
                 // contract_analyzer
               </p>
               <span
