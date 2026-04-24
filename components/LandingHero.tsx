@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 
 export function LandingHero() {
   return (
-    <section className="relative flex min-h-[92vh] items-center px-5 py-24 overflow-x-clip">
+    <section className="relative flex min-h-[70vh] lg:min-h-[92vh] items-center px-5 py-16 md:py-24 overflow-x-clip">
       {/* Floating gradient orbs */}
       <FloatingOrbs />
 

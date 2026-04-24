@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Syne, JetBrains_Mono } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
@@ -101,20 +102,33 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} ${syne.variable} ${mono.variable}`}
+    <ClerkProvider
+      appearance={{
+        variables: {
+          colorPrimary: "#6366f1", // match site indigo-500
+          colorBackground: "#09090b",
+          colorText: "#fafafa",
+          colorInputBackground: "#111116",
+          colorInputText: "#fafafa",
+          borderRadius: "0.75rem",
+        },
+      }}
     >
-      <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-      </head>
-      <body className="font-sans antialiased">
-        <SmoothScroll />
-        <ScrollProgress />
-        {children}
-      </body>
-    </html>
+      <html
+        lang="en"
+        className={`${inter.variable} ${syne.variable} ${mono.variable}`}
+      >
+        <head>
+          <link rel="icon" href="/favicon.ico" sizes="any" />
+          <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+          <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        </head>
+        <body className="font-sans antialiased">
+          <SmoothScroll />
+          <ScrollProgress />
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

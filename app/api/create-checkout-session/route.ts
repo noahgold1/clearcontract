@@ -1,27 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStripe, PLANS, type PlanKey } from "@/lib/stripe";
+import { getOrCreateDbUser } from "@/lib/user";
 
 export async function POST(req: NextRequest) {
   try {
+    // Middleware already required auth for this route, so this will throw
+    // only in misconfiguration.
+    const dbUser = await getOrCreateDbUser();
+
     const body = await req.json();
-    const { planKey, priceId: clientPriceId, email } = body as {
-      planKey?: PlanKey;
-      priceId?: string;
-      email?: string;
-    };
+    const { planKey } = body as { planKey?: PlanKey };
 
-    // Resolve the real Stripe price ID server-side. planKey is preferred —
-    // STRIPE_*_PRICE_ID env vars are not exposed to the client, so the
-    // priceId field on PLANS is always empty in the browser.
-    let priceId: string | null = null;
-    if (planKey && PLANS[planKey]) {
-      priceId = PLANS[planKey].priceId || null;
-    } else if (clientPriceId) {
-      // Backwards compat: if the caller already has a real Stripe price ID,
-      // accept it directly.
-      priceId = clientPriceId;
-    }
-
+    const priceId = planKey && PLANS[planKey] ? PLANS[planKey].priceId : null;
     if (!priceId) {
       return NextResponse.json(
         { error: "This plan is not yet available." },
@@ -35,7 +25,25 @@ export async function POST(req: NextRequest) {
       payment_method_types: ["card"],
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
-      ...(email ? { customer_email: email } : {}),
+      // If we already have a Stripe customer for this user, reuse it — keeps
+      // their payment methods / history consolidated across upgrades.
+      ...(dbUser.stripeCustomerId
+        ? { customer: dbUser.stripeCustomerId }
+        : { customer_email: dbUser.email }),
+      // Metadata flows back to us on the webhook so we can link the new
+      // subscription to the Clerk user.
+      metadata: {
+        clerkId: dbUser.clerkId,
+        dbUserId: dbUser.id,
+        planKey: planKey!,
+      },
+      subscription_data: {
+        metadata: {
+          clerkId: dbUser.clerkId,
+          dbUserId: dbUser.id,
+          planKey: planKey!,
+        },
+      },
       success_url: `${appUrl}/app?checkout=success`,
       cancel_url: `${appUrl}/pricing?checkout=canceled`,
       allow_promotion_codes: true,

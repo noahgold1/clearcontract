@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import { Check, ArrowRight } from "lucide-react";
 import { PLANS } from "@/lib/stripe";
 
 export function PricingTable() {
   const router = useRouter();
+  const { isSignedIn, isLoaded } = useAuth();
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,8 +18,15 @@ export function PricingTable() {
       return;
     }
 
-    // Send planKey to the API — it resolves the real Stripe price ID
-    // server-side from process.env (which the browser can't see).
+    // Paid plans need a signed-in user so we can link the Stripe customer
+    // back to them. Redirect to sign-up, then bounce back to /pricing to
+    // resume the upgrade.
+    if (isLoaded && !isSignedIn) {
+      const next = encodeURIComponent(`/pricing?resume=${planKey}`);
+      router.push(`/sign-up?redirect_url=${next}`);
+      return;
+    }
+
     setLoading(planKey);
     setError(null);
 
