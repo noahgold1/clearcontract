@@ -36,3 +36,6 @@ yarn-error.log*
 .env*.local
 .env.production
 .env*.local
+
+# clerk configuration (can include secrets)
+/.clerk/

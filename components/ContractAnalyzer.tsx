@@ -464,6 +464,7 @@ export function ContractAnalyzer() {
 
           {/* Business-only rewrite feature */}
           <RewriteSuggestions
+            contractText={text}
             onRequest={handleRewrite}
             loading={rewriteLoading}
             error={rewriteError}
