@@ -5,6 +5,14 @@ import Lenis from "lenis";
 
 export function SmoothScroll() {
   useEffect(() => {
+    // Skip Lenis on touch devices. Smoothed touch scrolling fights iOS/Android
+    // momentum scrolling and causes janky, floaty feel. Native scroll is
+    // better on phones.
+    const isTouch =
+      typeof window !== "undefined" &&
+      ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+    if (isTouch) return;
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),

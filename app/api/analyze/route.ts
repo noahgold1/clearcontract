@@ -11,10 +11,16 @@ const anthropic = new Anthropic({
 
 const VALID_MODES: AudienceMode[] = ["freelancer", "tenant", "founder", "employment", "general"];
 
+type ImagePayload = {
+  mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif";
+  base64: string;
+};
+
 export async function POST(req: NextRequest) {
   try {
     const contentType = req.headers.get("content-type") ?? "";
     let contractText = "";
+    let images: ImagePayload[] = [];
     let mode: AudienceMode = "general";
 
     if (contentType.includes("multipart/form-data")) {
@@ -23,6 +29,7 @@ export async function POST(req: NextRequest) {
       mode = VALID_MODES.includes(rawMode as AudienceMode) ? (rawMode as AudienceMode) : "general";
 
       const file = formData.get("file") as File | null;
+      const photo = formData.get("photo") as File | null;
       const pastedText = formData.get("text") as string | null;
 
       if (file && file.size > 0) {
@@ -31,6 +38,25 @@ export async function POST(req: NextRequest) {
         }
         const buffer = Buffer.from(await file.arrayBuffer());
         contractText = await extractTextFromPDF(buffer);
+      } else if (photo && photo.size > 0) {
+        if (photo.size > 10 * 1024 * 1024) {
+          return NextResponse.json({ error: "Photo too large. Maximum size is 10MB." }, { status: 400 });
+        }
+        const supported: ImagePayload["mediaType"][] = [
+          "image/jpeg",
+          "image/png",
+          "image/webp",
+          "image/gif",
+        ];
+        const mediaType = photo.type as ImagePayload["mediaType"];
+        if (!supported.includes(mediaType)) {
+          return NextResponse.json(
+            { error: "Unsupported image type. Use JPEG, PNG, WEBP, or GIF." },
+            { status: 400 }
+          );
+        }
+        const buffer = Buffer.from(await photo.arrayBuffer());
+        images = [{ mediaType, base64: buffer.toString("base64") }];
       } else if (pastedText) {
         contractText = pastedText;
       }
@@ -43,26 +69,49 @@ export async function POST(req: NextRequest) {
 
     contractText = contractText.trim();
 
-    if (!contractText) {
-      return NextResponse.json({ error: "No contract text provided." }, { status: 400 });
+    if (!contractText && images.length === 0) {
+      return NextResponse.json({ error: "No contract provided." }, { status: 400 });
     }
-    if (contractText.length < 50) {
+    if (contractText && contractText.length < 50) {
       return NextResponse.json({ error: "Contract text is too short to analyze." }, { status: 400 });
     }
 
-    const truncated = truncateToTokenLimit(contractText);
     const systemPrompt = buildSystemPrompt(mode);
+
+    const userContent:
+      | Array<
+          | { type: "text"; text: string }
+          | {
+              type: "image";
+              source: { type: "base64"; media_type: ImagePayload["mediaType"]; data: string };
+            }
+        > = [];
+
+    if (images.length > 0) {
+      for (const img of images) {
+        userContent.push({
+          type: "image",
+          source: { type: "base64", media_type: img.mediaType, data: img.base64 },
+        });
+      }
+      userContent.push({
+        type: "text",
+        text:
+          "This image contains a photograph or screenshot of a contract. First, OCR the text of the contract. Then analyze it and return ONLY a JSON array as specified in the system prompt.",
+      });
+    } else {
+      const truncated = truncateToTokenLimit(contractText);
+      userContent.push({
+        type: "text",
+        text: `Analyze the following contract and return ONLY a JSON array as specified:\n\n${truncated}`,
+      });
+    }
 
     const message = await anthropic.messages.create({
       model: "claude-sonnet-4-5",
       max_tokens: 8096,
       system: systemPrompt,
-      messages: [
-        {
-          role: "user",
-          content: `Analyze the following contract and return ONLY a JSON array as specified:\n\n${truncated}`,
-        },
-      ],
+      messages: [{ role: "user", content: userContent }],
     });
 
     const rawText = message.content[0].type === "text" ? message.content[0].text : "";

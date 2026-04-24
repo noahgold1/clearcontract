@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 
 export function LandingHero() {
   return (
-    <section className="relative flex min-h-[92vh] items-center px-5 py-24 overflow-hidden">
+    <section className="relative flex min-h-[92vh] items-center px-5 py-24 overflow-x-clip">
       {/* Floating gradient orbs */}
       <FloatingOrbs />
 
@@ -59,7 +59,7 @@ export function LandingHero() {
               (1.15+) because the Syne display font has deep descenders (g, y,
               p) that got clipped at 1.05. pb-2 gives the last line breathing
               room so "signing" isn't cut off at the bottom edge. */}
-          <h1 className="font-display text-[40px] sm:text-5xl md:text-[64px] leading-[1.15] md:leading-[1.12] font-bold tracking-tight mb-6 pb-2 break-words">
+          <h1 className="font-display text-[40px] sm:text-5xl md:text-[64px] leading-[1.25] md:leading-[1.2] font-bold tracking-tight mb-6 pb-4 break-words">
             <CharacterReveal text="Know exactly" className="text-white" />
             <br />
             <CharacterReveal

@@ -40,7 +40,10 @@ const defaultOrbs: Orb[] = [
 
 export function FloatingOrbs({ orbs = defaultOrbs }: { orbs?: Orb[] }) {
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+    // Hidden on mobile — three large blurred divs animating continuously tank
+    // FPS on low-end phones and the hero's indigo backdrop + grid pattern
+    // already carry enough visual weight there.
+    <div className="pointer-events-none absolute inset-0 overflow-hidden hidden md:block">
       {orbs.map((orb, i) => (
         <motion.div
           key={i}
