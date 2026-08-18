@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { type AudienceMode } from "@/lib/prompts";
 import { truncateToTokenLimit } from "@/lib/pdf-utils";
+import { ANTHROPIC_MODEL } from "@/lib/model";
+import { getOrCreateDbUser } from "@/lib/user";
 
 export const maxDuration = 60;
 
@@ -22,7 +24,7 @@ For each suggestion return an object:
 {
   "clause": "short name of the clause",
   "original": "the exact risky language from the contract, quoted verbatim (max 400 chars)",
-  "rewritten": "your proposed replacement language — specific, enforceable, balanced",
+  "rewritten": "your proposed replacement language, specific, enforceable, balanced",
   "why": "one sentence explaining how this rewrite reduces the signer's risk"
 }
 
@@ -30,10 +32,32 @@ Return ONLY a JSON array of these objects. No markdown, no prose, no code fences
 
 Prioritize: overbroad IP assignment, one-sided indemnification, unlimited liability, unilateral termination, auto-renewal with short notice windows, non-competes with excessive scope, and payment terms worse than industry standard.
 
-Keep rewrites realistic — changes a reasonable counterparty would actually accept, not pie-in-the-sky asks.`;
+Keep rewrites realistic, changes a reasonable counterparty would actually accept, not pie-in-the-sky asks.`;
 
 export async function POST(req: NextRequest) {
   try {
+    // --- Auth + plan enforcement --------------------------------------------
+    // AI rewrite is a Business-only feature. Gate it server-side so it can't be
+    // used for free by hitting the endpoint directly.
+    let dbUser;
+    try {
+      dbUser = await getOrCreateDbUser();
+    } catch {
+      return NextResponse.json(
+        { error: "Please sign in to use AI rewrite.", signInRequired: true },
+        { status: 401 }
+      );
+    }
+    if (dbUser.plan !== "BUSINESS") {
+      return NextResponse.json(
+        {
+          error: "AI contract rewrite is a Business feature. Upgrade to Business to unlock it.",
+          upgrade: true,
+        },
+        { status: 402 }
+      );
+    }
+
     const body = await req.json();
     const rawMode = body.mode as string;
     const mode: AudienceMode = VALID_MODES.includes(rawMode as AudienceMode)
@@ -50,17 +74,31 @@ export async function POST(req: NextRequest) {
 
     const truncated = truncateToTokenLimit(contractText);
 
-    const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-5",
-      max_tokens: 4096,
-      system: `${REWRITE_SYSTEM}\n\nThe signer's role: ${mode}.`,
-      messages: [
+    let message;
+    try {
+      message = await anthropic.messages.create({
+        model: ANTHROPIC_MODEL,
+        max_tokens: 4096,
+        system: `${REWRITE_SYSTEM}\n\nThe signer's role: ${mode}.`,
+        messages: [
+          {
+            role: "user",
+            content: `Contract:\n\n${truncated}\n\nReturn the JSON array of rewrite suggestions.`,
+          },
+        ],
+      });
+    } catch (anthropicErr: unknown) {
+      console.error("[rewrite] Anthropic API error:", anthropicErr);
+      const isDev = process.env.NODE_ENV !== "production";
+      const devDetail =
+        isDev && anthropicErr instanceof Error ? ` (dev: ${anthropicErr.message})` : "";
+      return NextResponse.json(
         {
-          role: "user",
-          content: `Contract:\n\n${truncated}\n\nReturn the JSON array of rewrite suggestions.`,
+          error: `Rewrite temporarily unavailable. Please try again in a moment.${devDetail}`,
         },
-      ],
-    });
+        { status: 503 }
+      );
+    }
 
     const rawText = message.content[0].type === "text" ? message.content[0].text : "";
     const cleaned = rawText

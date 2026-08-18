@@ -1,16 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { Check, ArrowRight } from "lucide-react";
-import { PLANS } from "@/lib/stripe";
+import { PLANS, type PlanKey } from "@/lib/stripe";
+
+type CurrentPlan = "FREE" | "PRO" | "BUSINESS";
+const PLAN_RANK: Record<CurrentPlan, number> = { FREE: 0, PRO: 1, BUSINESS: 2 };
 
 export function PricingTable() {
   const router = useRouter();
   const { isSignedIn, isLoaded } = useAuth();
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [currentPlan, setCurrentPlan] = useState<CurrentPlan | null>(null);
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) {
+      setCurrentPlan(null);
+      return;
+    }
+    let cancelled = false;
+    fetch("/api/usage")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (cancelled || !data) return;
+        const p = data.plan as CurrentPlan | undefined;
+        if (p === "FREE" || p === "PRO" || p === "BUSINESS") setCurrentPlan(p);
+      })
+      .catch(() => {
+        /* leave currentPlan null, falls back to default CTAs */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoaded, isSignedIn]);
 
   async function handleCheckout(_priceId: string | null, planKey: string) {
     if (planKey === "FREE") {
@@ -40,7 +65,7 @@ export function PricingTable() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        // Plan genuinely not wired up on the server (missing env var) —
+        // Plan genuinely not wired up on the server (missing env var).
         // route to the free app with a friendly notice.
         router.push(`/app?upgrade=${planKey.toLowerCase()}`);
       }
@@ -73,13 +98,13 @@ export function PricingTable() {
               key={plan.key}
               className={`relative rounded-2xl p-7 flex flex-col transition-all ${
                 isPopular
-                  ? "bg-indigo-500/[0.08] border border-indigo-500/40 shadow-xl shadow-indigo-500/10 md:scale-[1.02]"
+                  ? "bg-white/[0.08] border border-white/40 shadow-xl shadow-black/20 md:scale-[1.02]"
                   : "bg-zinc-900/50 border border-white/[0.07] hover:border-white/[0.15]"
               }`}
             >
               {isPopular && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                  <span className="bg-indigo-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-full tracking-wide uppercase shadow-lg shadow-indigo-500/40">
+                  <span className="bg-white text-zinc-950 text-[11px] font-bold px-3 py-1.5 rounded-full tracking-wide uppercase shadow-lg shadow-black/20">
                     Most Popular
                   </span>
                 </div>
@@ -89,7 +114,7 @@ export function PricingTable() {
               <div className="mb-6">
                 <h3
                   className={`text-base font-semibold mb-1 ${
-                    isPopular ? "text-indigo-300" : "text-white"
+                    isPopular ? "text-zinc-200" : "text-white"
                   }`}
                 >
                   {plan.name}
@@ -112,25 +137,47 @@ export function PricingTable() {
                 )}
               </div>
 
-              {/* CTA button — moved up for visibility */}
-              <button
-                onClick={() => handleCheckout(plan.priceId, plan.key)}
-                disabled={loading === plan.key}
-                className={`w-full py-3 px-5 rounded-xl font-semibold text-sm transition-all disabled:opacity-50 mb-6 inline-flex items-center justify-center gap-2 group ${
-                  isPopular
-                    ? "bg-indigo-500 hover:bg-indigo-400 text-white shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50"
-                    : "bg-white/[0.06] hover:bg-white/[0.1] text-white border border-white/[0.08]"
-                }`}
-              >
-                {loading === plan.key ? (
-                  "Redirecting..."
-                ) : (
-                  <>
-                    {plan.cta}
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-                  </>
-                )}
-              </button>
+              {(() => {
+                const planKey = plan.key as PlanKey;
+                let ctaLabel: string = plan.cta;
+                let isCurrent = false;
+                if (currentPlan) {
+                  const cardRank = PLAN_RANK[planKey];
+                  const userRank = PLAN_RANK[currentPlan];
+                  if (cardRank === userRank) {
+                    isCurrent = true;
+                    ctaLabel = "Current plan";
+                  } else if (cardRank > userRank) {
+                    ctaLabel = `Upgrade to ${plan.name}`;
+                  } else {
+                    ctaLabel = `Downgrade to ${plan.name}`;
+                  }
+                }
+                return (
+                  <button
+                    onClick={() => handleCheckout(plan.priceId, plan.key)}
+                    disabled={loading === plan.key || isCurrent}
+                    className={`w-full py-3 px-5 rounded-xl font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed mb-6 inline-flex items-center justify-center gap-2 group ${
+                      isCurrent
+                        ? "bg-white/[0.04] text-zinc-500 border border-white/[0.08]"
+                        : isPopular
+                        ? "bg-white hover:bg-zinc-200 text-zinc-950 shadow-lg shadow-black/20 hover:shadow-black/20"
+                        : "bg-white/[0.06] hover:bg-white/[0.1] text-white border border-white/[0.08]"
+                    }`}
+                  >
+                    {loading === plan.key ? (
+                      "Redirecting..."
+                    ) : (
+                      <>
+                        {ctaLabel}
+                        {!isCurrent && (
+                          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                        )}
+                      </>
+                    )}
+                  </button>
+                );
+              })()}
 
               {/* Divider */}
               <div className="border-t border-white/[0.05] mb-5" />
@@ -144,7 +191,7 @@ export function PricingTable() {
                     return (
                       <li
                         key={feature}
-                        className="text-xs font-semibold uppercase tracking-wider text-indigo-400 -mb-1"
+                        className="text-xs font-semibold uppercase tracking-wider text-zinc-200 -mb-1"
                       >
                         {feature}
                       </li>
@@ -154,7 +201,7 @@ export function PricingTable() {
                     <li key={feature + idx} className="flex items-start gap-2.5 text-sm">
                       <Check
                         className={`w-4 h-4 mt-0.5 shrink-0 ${
-                          isPopular ? "text-indigo-400" : "text-emerald-500"
+                          isPopular ? "text-zinc-200" : "text-emerald-500"
                         }`}
                         strokeWidth={3}
                       />

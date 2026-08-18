@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "ClearContract — AI Contract Analyzer";
+export const alt = "ClearContract, AI Contract Analyzer";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -44,7 +44,7 @@ export default function OGImage() {
             gap: "8px",
             border: "1px solid rgba(99,102,241,0.4)",
             background: "rgba(99,102,241,0.1)",
-            color: "#a5b4fc",
+            color: "#d4d4d8",
             fontSize: "16px",
             fontWeight: 600,
             padding: "8px 20px",
@@ -58,7 +58,7 @@ export default function OGImage() {
               width: "8px",
               height: "8px",
               borderRadius: "50%",
-              background: "#818cf8",
+              background: "#e4e4e7",
             }}
           />
           Powered by Claude AI
@@ -86,7 +86,7 @@ export default function OGImage() {
             lineHeight: 1.05,
             letterSpacing: "-0.03em",
             marginBottom: "28px",
-            background: "linear-gradient(135deg, #e0e7ff 0%, #a5b4fc 45%, #7c3aed 100%)",
+            background: "linear-gradient(135deg, #fafafa 0%, #d4d4d8 45%, #52525b 100%)",
             backgroundClip: "text",
             color: "transparent",
           }}
@@ -105,7 +105,7 @@ export default function OGImage() {
             marginBottom: "48px",
           }}
         >
-          AI-powered contract analysis. Plain-English clause breakdowns, risk flags, and insights — in seconds.
+          AI-powered contract analysis. Plain-English clause breakdowns, risk flags, and insights, in seconds.
         </div>
 
         {/* Pills row */}

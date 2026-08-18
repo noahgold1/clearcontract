@@ -16,7 +16,7 @@ export function Navbar() {
       >
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-7 h-7 rounded-lg bg-indigo-500 flex items-center justify-center text-sm shadow-lg shadow-indigo-500/30">
+          <div className="w-7 h-7 rounded-lg bg-brand-gradient flex items-center justify-center text-sm shadow-lg shadow-black/20">
             📋
           </div>
           <span className="font-semibold text-[15px] text-white tracking-tight">
@@ -24,7 +24,7 @@ export function Navbar() {
           </span>
         </Link>
 
-        {/* Nav — tighter on mobile so the CTA button doesn't wrap to 2 lines. */}
+        {/* Nav, tighter on mobile so the CTA button doesn't wrap to 2 lines. */}
         <nav className="flex items-center gap-0.5 sm:gap-1">
           <Link
             href="/pricing"
@@ -47,7 +47,7 @@ export function Navbar() {
             Analyzer
           </Link>
 
-          {/* Auth UI — switch between avatar menu and sign-in/CTA based on
+          {/* Auth UI, switch between avatar menu and sign-in/CTA based on
               client-side auth state. Render nothing until Clerk is loaded to
               avoid a flicker between states. */}
           {isLoaded && isSignedIn && (
@@ -59,13 +59,13 @@ export function Navbar() {
           {isLoaded && !isSignedIn && (
             <>
               <SignInButton mode="modal">
-                <button className="px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors">
+                <button className="hidden sm:inline-flex px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors">
                   Sign in
                 </button>
               </SignInButton>
               <Link
                 href="/app"
-                className="ml-1 sm:ml-2 px-3 sm:px-4 py-1.5 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white text-xs sm:text-sm font-semibold whitespace-nowrap transition-all shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40"
+                className="btn-brand ml-1 sm:ml-2 px-3 sm:px-4 py-1.5 rounded-lg text-zinc-950 text-xs sm:text-sm font-semibold whitespace-nowrap transition-all"
               >
                 Try free
               </Link>

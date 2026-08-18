@@ -15,8 +15,8 @@ export function SplineScene({ scene, className }: SplineSceneProps) {
       fallback={
         <div className="w-full h-full flex items-center justify-center">
           <div className="relative w-12 h-12">
-            <div className="absolute inset-0 rounded-full border-2 border-indigo-500/20" />
-            <div className="absolute inset-0 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
+            <div className="absolute inset-0 rounded-full border-2 border-white/20" />
+            <div className="absolute inset-0 rounded-full border-2 border-white/15 border-t-transparent animate-spin" />
           </div>
         </div>
       }

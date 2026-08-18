@@ -14,7 +14,7 @@ interface Orb {
 const defaultOrbs: Orb[] = [
   {
     size: 520,
-    color: "rgba(99,102,241,0.28)",
+    color: "rgba(255,255,255,0.08)",
     top: "-10%",
     left: "-8%",
     duration: 22,
@@ -22,7 +22,7 @@ const defaultOrbs: Orb[] = [
   },
   {
     size: 420,
-    color: "rgba(168,85,247,0.22)",
+    color: "rgba(255,255,255,0.06)",
     top: "30%",
     left: "60%",
     duration: 28,
@@ -30,7 +30,7 @@ const defaultOrbs: Orb[] = [
   },
   {
     size: 380,
-    color: "rgba(236,72,153,0.18)",
+    color: "rgba(255,255,255,0.05)",
     top: "70%",
     left: "10%",
     duration: 32,
@@ -40,7 +40,7 @@ const defaultOrbs: Orb[] = [
 
 export function FloatingOrbs({ orbs = defaultOrbs }: { orbs?: Orb[] }) {
   return (
-    // Hidden on mobile — three large blurred divs animating continuously tank
+    // Hidden on mobile, three large blurred divs animating continuously tank
     // FPS on low-end phones and the hero's indigo backdrop + grid pattern
     // already carry enough visual weight there.
     <div className="pointer-events-none absolute inset-0 overflow-hidden hidden md:block">

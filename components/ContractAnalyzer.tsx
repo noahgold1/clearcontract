@@ -37,6 +37,10 @@ export function ContractAnalyzer() {
   const [error, setError] = useState<string | null>(null);
   const [clauses, setClauses] = useState<ClauseResult[] | null>(null);
   const [filter, setFilter] = useState<FilterStatus>("all");
+  // The contract text the server actually analyzed, for paste it's what the
+  // user typed, for a PDF it's the server-extracted text. Kept so the Business
+  // rewrite feature can operate on PDF uploads, not just pasted text.
+  const [analyzedText, setAnalyzedText] = useState("");
 
   // Rewrite feature (Business tier)
   const [rewriteLoading, setRewriteLoading] = useState(false);
@@ -60,6 +64,7 @@ export function ContractAnalyzer() {
     setClauses(null);
     setRewrites(null);
     setRewriteError(null);
+    setAnalyzedText("");
     setFilter("all");
     setLoading(true);
 
@@ -89,6 +94,13 @@ export function ContractAnalyzer() {
         return;
       }
       setClauses(data.clauses);
+      // Server returns the text it analyzed (extracted from the PDF when
+      // uploaded). Fall back to the pasted text. Photo/OCR input returns "".
+      setAnalyzedText(
+        typeof data.contractText === "string" && data.contractText.trim()
+          ? data.contractText
+          : text
+      );
       setTimeout(
         () => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
         100
@@ -101,12 +113,13 @@ export function ContractAnalyzer() {
   }
 
   async function handleRewrite() {
-    // Rewrite needs the contract text. For paste input we have it directly;
-    // for uploads/photos, the server already extracted it during analysis but
-    // we don't keep a copy client-side. So only enable rewrite for pasted text.
-    if (!text.trim()) {
+    // Rewrite runs on the text the server analyzed. That covers pasted text and
+    // PDF uploads (the server returns the extracted text). Photo/OCR input has
+    // no client-side text, so guide the user to paste or upload a PDF instead.
+    const source = analyzedText.trim();
+    if (!source) {
       setRewriteError(
-        "Rewrite currently needs pasted contract text. Paste your contract into the Paste tab and run a fresh analysis to enable this."
+        "Rewrite needs the contract's text. It works on pasted contracts and PDF uploads, photo scans can't be rewritten. Paste the text or upload the PDF, then run a fresh analysis."
       );
       return;
     }
@@ -118,7 +131,7 @@ export function ContractAnalyzer() {
       const res = await fetch("/api/rewrite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, mode }),
+        body: JSON.stringify({ text: source, mode }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -179,9 +192,6 @@ export function ContractAnalyzer() {
       >
         {/* Mode selector */}
         <div>
-          <label className="hidden sm:block text-[11px] font-semibold text-zinc-500 uppercase tracking-widest mb-3 font-mono-brand">
-            // audience_mode
-          </label>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
             {(
               Object.entries(AUDIENCE_MODES) as [
@@ -195,7 +205,7 @@ export function ContractAnalyzer() {
                 onClick={() => setMode(key)}
                 className={`flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl border text-xs font-medium transition-all ${
                   mode === key
-                    ? "border-indigo-500/50 bg-indigo-500/10 text-indigo-300"
+                    ? "border-white/50 bg-white/10 text-zinc-200"
                     : "border-white/[0.07] hover:border-white/[0.15] text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.04]"
                 }`}
               >
@@ -208,9 +218,6 @@ export function ContractAnalyzer() {
 
         {/* Input method */}
         <div>
-          <label className="hidden sm:block text-[11px] font-semibold text-zinc-500 uppercase tracking-widest mb-3 font-mono-brand">
-            // contract_input
-          </label>
           <div className="grid grid-cols-3 sm:flex sm:w-fit gap-1 bg-white/[0.04] border border-white/[0.07] rounded-lg p-1 mb-4">
             {inputMethodTabs.map(({ key, label }) => (
               <button
@@ -219,7 +226,7 @@ export function ContractAnalyzer() {
                 onClick={() => setInputMethod(key)}
                 className={`px-2 sm:px-4 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-all whitespace-nowrap ${
                   inputMethod === key
-                    ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/30"
+                    ? "bg-white text-zinc-950 shadow-lg shadow-black/20"
                     : "text-zinc-500 hover:text-zinc-300"
                 }`}
               >
@@ -234,7 +241,7 @@ export function ContractAnalyzer() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder="Paste your contract text here..."
-                className="w-full h-52 px-4 py-3 rounded-xl bg-[#0d0d11] border border-white/[0.07] text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 resize-none transition-colors pb-8"
+                className="w-full h-52 px-4 py-3 rounded-xl bg-[#0d0d11] border border-white/[0.07] text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-white/50 focus:ring-1 focus:ring-white/30 resize-none transition-colors pb-8"
               />
               <div className="absolute bottom-2.5 right-3 flex items-center gap-2 pointer-events-none">
                 {charCount > 0 && (
@@ -255,7 +262,7 @@ export function ContractAnalyzer() {
           {inputMethod === "upload" && (
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="border border-dashed border-white/[0.1] rounded-xl p-10 text-center cursor-pointer hover:border-indigo-500/40 hover:bg-indigo-500/[0.03] transition-all"
+              className="border border-dashed border-white/[0.1] rounded-xl p-10 text-center cursor-pointer hover:border-white/40 hover:bg-white/[0.03] transition-all"
             >
               <input
                 ref={fileInputRef}
@@ -269,7 +276,7 @@ export function ContractAnalyzer() {
                   <div className="text-3xl">📄</div>
                   <p className="font-medium text-zinc-200 text-sm">{file.name}</p>
                   <p className="text-zinc-600 text-xs">
-                    {(file.size / 1024).toFixed(1)} KB —{" "}
+                    {(file.size / 1024).toFixed(1)} KB ·{" "}
                     <button
                       type="button"
                       onClick={(e) => {
@@ -296,7 +303,7 @@ export function ContractAnalyzer() {
           {inputMethod === "photo" && (
             <div
               onClick={() => photoInputRef.current?.click()}
-              className="border border-dashed border-white/[0.1] rounded-xl p-10 text-center cursor-pointer hover:border-indigo-500/40 hover:bg-indigo-500/[0.03] transition-all"
+              className="border border-dashed border-white/[0.1] rounded-xl p-10 text-center cursor-pointer hover:border-white/40 hover:bg-white/[0.03] transition-all"
             >
               <input
                 ref={photoInputRef}
@@ -318,7 +325,7 @@ export function ContractAnalyzer() {
                     className="max-h-64 mx-auto rounded-lg border border-white/[0.07]"
                   />
                   <p className="text-zinc-500 text-xs">
-                    {photo.name} · {(photo.size / 1024).toFixed(1)} KB —{" "}
+                    {photo.name} · {(photo.size / 1024).toFixed(1)} KB ·{" "}
                     <button
                       type="button"
                       onClick={(e) => {
@@ -351,7 +358,7 @@ export function ContractAnalyzer() {
         <button
           type="submit"
           disabled={submitDisabled}
-          className="w-full bg-indigo-500 hover:bg-indigo-400 disabled:bg-indigo-500/30 disabled:text-indigo-300/40 text-white font-semibold py-3.5 rounded-xl text-sm transition-all btn-glow flex items-center justify-center gap-2"
+          className="w-full btn-brand disabled:opacity-40 disabled:saturate-[0.6] disabled:cursor-not-allowed text-zinc-950 font-semibold py-3.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2"
         >
           {loading ? (
             <>
@@ -384,9 +391,9 @@ export function ContractAnalyzer() {
       {loading && (
         <div className="space-y-4">
           <div className="flex items-center gap-3 py-2">
-            <div className="w-2 h-2 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.3s]" />
-            <div className="w-2 h-2 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.15s]" />
-            <div className="w-2 h-2 rounded-full bg-indigo-400 animate-bounce" />
+            <div className="w-2 h-2 rounded-full bg-white animate-bounce [animation-delay:-0.3s]" />
+            <div className="w-2 h-2 rounded-full bg-white animate-bounce [animation-delay:-0.15s]" />
+            <div className="w-2 h-2 rounded-full bg-white animate-bounce" />
             <span className="text-zinc-500 text-sm">Reading your contract...</span>
           </div>
           <div className="grid sm:grid-cols-2 gap-3">
@@ -404,9 +411,6 @@ export function ContractAnalyzer() {
           <div className="flex items-start justify-between flex-wrap gap-3 pt-1">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="hidden sm:inline text-[11px] font-semibold text-zinc-500 uppercase tracking-widest font-mono-brand">
-                  // results
-                </span>
               </div>
               <h2 className="text-xl font-bold text-white font-display">Analysis Complete</h2>
               <div className="flex items-center gap-4 mt-1.5 text-xs font-medium">
@@ -464,7 +468,7 @@ export function ContractAnalyzer() {
 
           {/* Business-only rewrite feature */}
           <RewriteSuggestions
-            contractText={text}
+            contractText={analyzedText || text}
             onRequest={handleRewrite}
             loading={rewriteLoading}
             error={rewriteError}

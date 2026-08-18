@@ -4,11 +4,11 @@ import { BorderBeam } from "./ui/border-beam";
 export function HeroPreview() {
   const clauses = [
     {
-      title: "IP Assignment — Work for Hire",
+      title: "IP Assignment, Work for Hire",
       plain:
         "All work you create belongs entirely to the client, including anything built outside of work hours if it relates to their business.",
       status: "risk" as const,
-      flag: "Overly broad — covers work done on personal time.",
+      flag: "Overly broad, covers work done on personal time.",
     },
     {
       title: "Payment Terms",
@@ -47,8 +47,8 @@ export function HeroPreview() {
   return (
     <div className="relative w-full max-w-sm mx-auto">
       {/* Window chrome */}
-      <div className="relative rounded-2xl border border-white/[0.1] bg-[#0e0e13] shadow-2xl shadow-indigo-950/40 overflow-hidden">
-        <BorderBeam size={250} duration={12} colorFrom="#818cf8" colorTo="#a855f7" />
+      <div className="relative rounded-2xl border border-white/[0.1] bg-[#0e0e13] shadow-2xl shadow-black/20 overflow-hidden">
+        <BorderBeam size={250} duration={12} colorFrom="#ffffff" colorTo="#a1a1aa" />
 
         {/* Title bar */}
         <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06] bg-[#0a0a0f]">
@@ -63,8 +63,8 @@ export function HeroPreview() {
             </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 pulse-dot" />
-            <span className="text-[10px] text-indigo-400 font-medium">Analyzing</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-white pulse-dot" />
+            <span className="text-[10px] text-zinc-200 font-medium">Analyzing</span>
           </div>
         </div>
 
@@ -118,7 +118,7 @@ export function HeroPreview() {
         <div className="px-3 pb-3 flex items-center gap-2">
           <Link
             href="/app"
-            className="flex-1 text-center text-[11px] font-semibold bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 py-1.5 rounded-lg border border-indigo-500/20 transition-colors"
+            className="flex-1 text-center text-[11px] font-semibold bg-white/20 hover:bg-white/30 text-zinc-200 py-1.5 rounded-lg border border-white/20 transition-colors"
           >
             ⬇ Download PDF
           </Link>

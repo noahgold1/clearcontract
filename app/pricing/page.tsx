@@ -6,7 +6,7 @@ import { PricingTable } from "@/components/PricingTable";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "ClearContract pricing — start free with no account required. Upgrade for unlimited contract analyses, PDF exports, and priority processing.",
+    "ClearContract pricing, start free with no account required. Upgrade for unlimited contract analyses, PDF exports, and priority processing.",
   alternates: {
     canonical: "https://clearcontract-two.vercel.app/pricing",
   },
@@ -22,9 +22,6 @@ export default function PricingPage() {
 
           {/* Header */}
           <div className="text-center mb-16">
-            <p className="hidden sm:block text-[11px] font-semibold text-indigo-400 uppercase tracking-widest font-mono-brand mb-4">
-              // pricing
-            </p>
             <h1 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight font-display">
               Simple,{" "}
               <span className="text-gradient">transparent</span>{" "}
@@ -40,9 +37,6 @@ export default function PricingPage() {
           {/* FAQ */}
           <div className="mt-24 max-w-3xl mx-auto">
             <div className="text-center mb-10">
-              <p className="hidden sm:block text-[11px] font-semibold text-zinc-600 uppercase tracking-widest font-mono-brand mb-3">
-                // faq
-              </p>
               <h2 className="text-2xl font-bold text-white font-display">
                 Frequently asked questions
               </h2>
@@ -51,7 +45,7 @@ export default function PricingPage() {
               {[
                 {
                   q: "What counts as one analysis?",
-                  a: "Each time you submit a contract for analysis counts as one use. You can re-analyze the same contract as many times as you like — each submission counts separately.",
+                  a: "Each time you submit a contract for analysis counts as one use. You can re-analyze the same contract as many times as you like, each submission counts separately.",
                 },
                 {
                   q: "When do free tier credits reset?",
@@ -59,11 +53,11 @@ export default function PricingPage() {
                 },
                 {
                   q: "What's the difference between Free and Pro?",
-                  a: "Free gives you 3 analyses per month with contracts up to 10,000 words (~15 pages). Pro removes both limits — unlimited analyses on contracts up to 75,000 words (~115 pages), priority processing, branded PDFs without our footer watermark, and 90 days of saved history.",
+                  a: "Free gives you 3 analyses per month with contracts up to 10,000 words (~15 pages). Pro removes both limits, unlimited analyses on contracts up to 75,000 words (~115 pages) and PDF export of every analysis.",
                 },
                 {
                   q: "What does Business unlock that Pro doesn't?",
-                  a: "Business adds team collaboration features: 5 user seats, side-by-side contract comparison, bulk analysis (10 contracts at once), annotated PDFs with clause highlights, custom audience mode prompts your team can save, Slack notifications, and a 4-hour priority support SLA.",
+                  a: "Business adds the AI contract rewrite tool, which suggests safer replacement language for risky clauses you can accept, reject, and merge back into your contract. It also includes unlimited photo scans and best-effort priority support.",
                 },
                 {
                   q: "Is this actually legal advice?",
@@ -71,7 +65,7 @@ export default function PricingPage() {
                 },
                 {
                   q: "Can I cancel my subscription?",
-                  a: "Yes, anytime. You'll keep access until the end of your billing period. Use the billing portal to manage or cancel — no questions asked, and we offer a 14-day money-back guarantee on all paid plans.",
+                  a: "Yes, anytime. You'll keep access until the end of your billing period. Use the billing portal to manage or cancel, no questions asked, and we offer a 14-day money-back guarantee on all paid plans.",
                 },
                 {
                   q: "What file types are supported?",
@@ -79,7 +73,7 @@ export default function PricingPage() {
                 },
                 {
                   q: "Do you store my contracts?",
-                  a: "Free and Pro: contracts are processed in-memory and never stored on our servers — only your analysis history is saved (Pro only, 90 days). Business: same as Pro, plus optional team-shared cloud storage if enabled.",
+                  a: "We do not store the original contract text on our servers, it's processed in-memory and discarded after the analysis returns. The structured analysis results (clause summaries, risk flags) are saved against your account so you can revisit them. Anthropic, our AI provider, also does not train models on your inputs.",
                 },
               ].map(({ q, a }) => (
                 <div

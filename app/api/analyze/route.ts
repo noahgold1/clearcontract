@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { buildSystemPrompt, type AudienceMode, type ClauseResult } from "@/lib/prompts";
 import { extractTextFromPDF, truncateToTokenLimit } from "@/lib/pdf-utils";
+import { ANTHROPIC_MODEL } from "@/lib/model";
+import { getOrCreateDbUser } from "@/lib/user";
+import { checkAndIncrementUsage } from "@/lib/usage";
 
 export const maxDuration = 60; // Vercel max for hobby plan
 
@@ -76,6 +79,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Contract text is too short to analyze." }, { status: 400 });
     }
 
+    // --- Auth + plan enforcement --------------------------------------------
+    // Analysis is a metered, paid feature. Require a signed-in user and check
+    // their plan quota BEFORE spending an Anthropic call, so nobody (signed-out
+    // or over-limit) can burn the API key.
+    let dbUser;
+    try {
+      dbUser = await getOrCreateDbUser();
+    } catch {
+      return NextResponse.json(
+        { error: "Please sign in to analyze contracts.", signInRequired: true },
+        { status: 401 }
+      );
+    }
+
+    const isPhoto = images.length > 0;
+    const usage = await checkAndIncrementUsage(dbUser.id, dbUser.plan, isPhoto ? "photo" : "analysis");
+    if (!usage.allowed) {
+      const msg =
+        usage.reason === "photo"
+          ? `You've used all ${usage.limit} photo scan${usage.limit === 1 ? "" : "s"} on your ${dbUser.plan} plan this month. Upgrade for more photo scans.`
+          : `You've used all ${usage.limit} free analyses this month. Upgrade to Pro for unlimited analyses.`;
+      return NextResponse.json({ error: msg, upgrade: true }, { status: 402 });
+    }
+
     const systemPrompt = buildSystemPrompt(mode);
 
     const userContent:
@@ -107,12 +134,26 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-5",
-      max_tokens: 8096,
-      system: systemPrompt,
-      messages: [{ role: "user", content: userContent }],
-    });
+    let message;
+    try {
+      message = await anthropic.messages.create({
+        model: ANTHROPIC_MODEL,
+        max_tokens: 8096,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userContent }],
+      });
+    } catch (anthropicErr: unknown) {
+      console.error("[analyze] Anthropic API error:", anthropicErr);
+      const isDev = process.env.NODE_ENV !== "production";
+      const devDetail =
+        isDev && anthropicErr instanceof Error ? ` (dev: ${anthropicErr.message})` : "";
+      return NextResponse.json(
+        {
+          error: `Analysis temporarily unavailable. Please try again in a moment.${devDetail}`,
+        },
+        { status: 503 }
+      );
+    }
 
     const rawText = message.content[0].type === "text" ? message.content[0].text : "";
 
@@ -150,7 +191,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json({ clauses });
+    // Return the extracted text (empty for photo/OCR input) so the Business
+    // rewrite feature can reuse it without the user re-pasting, this is what
+    // makes "rewrite a PDF" work.
+    return NextResponse.json({ clauses, contractText });
   } catch (err: unknown) {
     console.error("[analyze] error:", err);
 

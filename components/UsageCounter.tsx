@@ -10,12 +10,12 @@ interface UsageCounterProps {
 export function UsageCounter({ used, limit, plan }: UsageCounterProps) {
   if (plan !== "FREE") {
     return (
-      <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5 text-sm">
-        <span className="w-2 h-2 rounded-full bg-blue-500" />
-        <span className="font-semibold text-blue-700 capitalize">
+      <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm">
+        <span className="w-2 h-2 rounded-full bg-white/50" />
+        <span className="font-semibold text-zinc-200 capitalize">
           {plan.toLowerCase()} plan
         </span>
-        <span className="text-blue-500">— Unlimited analyses</span>
+        <span className="text-zinc-400">Unlimited analyses</span>
       </div>
     );
   }
@@ -45,7 +45,7 @@ export function UsageCounter({ used, limit, plan }: UsageCounterProps) {
       {isAtLimit ? (
         <Link
           href="/pricing"
-          className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+          className="bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
         >
           Upgrade
         </Link>

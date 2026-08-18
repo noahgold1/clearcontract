@@ -69,17 +69,25 @@ export function CharacterReveal({
   text,
   className,
   delay = 0,
+  triggerOnMount = true,
 }: {
   text: string;
   className?: string;
   delay?: number;
+  triggerOnMount?: boolean;
 }) {
+  // Default: fire on mount so above-the-fold reveals (like the hero) animate
+  // immediately instead of waiting for a scroll event that may never come.
+  // Callers below the fold can pass triggerOnMount={false} to opt into the
+  // scroll-triggered behavior.
+  const triggerProps = triggerOnMount
+    ? { animate: "visible" as const }
+    : { whileInView: "visible" as const, viewport: { once: true } };
   return (
     <motion.span
-      className={cn("inline", className)}
+      className={cn("inline-block", className)}
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true }}
+      {...triggerProps}
       variants={
         {
           hidden: {},

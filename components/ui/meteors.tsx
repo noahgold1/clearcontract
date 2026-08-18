@@ -21,12 +21,12 @@ export const Meteors = ({ number, className }: { number?: number; className?: st
         <span
           key={idx}
           className={cn(
-            "pointer-events-none absolute left-1/2 top-1/2 size-0.5 rotate-[215deg] animate-meteor rounded-full bg-indigo-400 shadow-[0_0_0_1px_#ffffff10]",
+            "pointer-events-none absolute left-1/2 top-1/2 size-0.5 rotate-[215deg] animate-meteor rounded-full bg-white shadow-[0_0_0_1px_#ffffff10]",
             className
           )}
           style={style}
         >
-          <div className="pointer-events-none absolute top-1/2 -z-10 h-px w-[50px] -translate-y-1/2 bg-gradient-to-r from-indigo-400 to-transparent" />
+          <div className="pointer-events-none absolute top-1/2 -z-10 h-px w-[50px] -translate-y-1/2 bg-gradient-to-r from-white/10 to-transparent" />
         </span>
       ))}
     </>

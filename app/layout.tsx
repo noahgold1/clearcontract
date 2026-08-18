@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Syne, JetBrains_Mono } from "next/font/google";
+import { Inter, Baloo_2, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
@@ -14,7 +14,7 @@ const inter = Inter({
   weight: ["400", "500", "600", "700", "800"],
 });
 
-const syne = Syne({
+const baloo = Baloo_2({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-display",
@@ -28,10 +28,19 @@ const mono = JetBrains_Mono({
   weight: ["400", "500", "600"],
 });
 
+// Display accent for the hero headline, used italic.
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-serif",
+  style: ["normal", "italic"],
+  weight: ["400", "500", "600"],
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: "ClearContract — AI Contract Analyzer | Understand What You're Signing",
+    default: "ClearContract: AI Contract Analyzer | Understand What You're Signing",
     template: "%s | ClearContract",
   },
   description:
@@ -67,21 +76,21 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: APP_URL,
     siteName: "ClearContract",
-    title: "ClearContract — Understand Any Contract in Seconds",
+    title: "ClearContract: Understand Any Contract in Seconds",
     description:
-      "AI-powered contract analysis. Paste any contract and get a plain-English breakdown of every clause, risk flags, and actionable insights — powered by Claude AI.",
+      "AI-powered contract analysis. Paste any contract and get a plain-English breakdown of every clause, risk flags, and actionable insights, powered by Claude AI.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "ClearContract — AI Contract Analyzer",
+        alt: "ClearContract: AI Contract Analyzer",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ClearContract — Understand Any Contract in Seconds",
+    title: "ClearContract: Understand Any Contract in Seconds",
     description:
       "Paste any contract. Get plain-English explanations of every clause. Flag risks instantly. Powered by Claude AI.",
     images: ["/og-image.png"],
@@ -105,7 +114,7 @@ export default function RootLayout({
     <ClerkProvider
       appearance={{
         variables: {
-          colorPrimary: "#6366f1", // match site indigo-500
+          colorPrimary: "#a1a1aa", // match site indigo-500
           colorBackground: "#09090b",
           colorText: "#fafafa",
           colorInputBackground: "#111116",
@@ -116,7 +125,7 @@ export default function RootLayout({
     >
       <html
         lang="en"
-        className={`${inter.variable} ${syne.variable} ${mono.variable}`}
+        className={`${inter.variable} ${baloo.variable} ${mono.variable} ${playfair.variable}`}
       >
         <head>
           <link rel="icon" href="/favicon.ico" sizes="any" />

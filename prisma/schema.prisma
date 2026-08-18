@@ -30,8 +30,11 @@ model User {
   subscriptionId     String?
   plan               Plan               @default(FREE)
   subscriptionStatus SubscriptionStatus @default(INACTIVE)
-  // Usage tracking — resets monthly
+  // Usage tracking — resets monthly. monthlyUsage counts ALL analyses
+  // (paste/PDF/photo); monthlyPhotoScans counts only photo scans, which
+  // most plans cap more tightly than plain analyses.
   monthlyUsage       Int                @default(0)
+  monthlyPhotoScans  Int                @default(0)
   usageResetDate     DateTime           @default(now())
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt

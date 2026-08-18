@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
         break;
       }
 
-      // Cancellation — drop back to FREE.
+      // Cancellation, drop back to FREE.
       case "customer.subscription.deleted": {
         const sub = event.data.object as Stripe.Subscription;
         const customerId =

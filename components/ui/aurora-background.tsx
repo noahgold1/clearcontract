@@ -22,7 +22,7 @@ export const AuroraBackground = ({
         <div
           className={cn(
             `pointer-events-none absolute -inset-[10px] opacity-50 will-change-transform
-            [--aurora:repeating-linear-gradient(100deg,#3b82f6_10%,#a5b4fc_15%,#93c5fd_20%,#ddd6fe_25%,#60a5fa_30%)]
+            [--aurora:repeating-linear-gradient(100deg,#ffffff_10%,#d4d4d8_15%,#93c5fd_20%,#ddd6fe_25%,#e4e4e7_30%)]
             [--dark-gradient:repeating-linear-gradient(100deg,#000_0%,#000_7%,transparent_10%,transparent_12%,#000_16%)]
             [--white-gradient:repeating-linear-gradient(100deg,#fff_0%,#fff_7%,transparent_10%,transparent_12%,#fff_16%)]
             [background-image:var(--white-gradient),var(--aurora)]

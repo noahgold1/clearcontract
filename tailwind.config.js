@@ -14,6 +14,11 @@ module.exports = {
           500: "#6366f1",
           600: "#4f46e5",
         },
+        brand: {
+          blue: "#3b82f6",
+          purple: "#a855f7",
+          pink: "#ec4899",
+        },
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
@@ -22,7 +27,7 @@ module.exports = {
       },
       backgroundImage: {
         "hero-radial":
-          "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99,102,241,0.18), transparent)",
+          "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255,255,255,0.05), transparent)",
       },
       animation: {
         aurora: "aurora 60s linear infinite",

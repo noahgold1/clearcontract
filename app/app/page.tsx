@@ -9,18 +9,18 @@ import { prisma } from "@/lib/db";
 export const metadata: Metadata = {
   title: "Analyze a Contract",
   description:
-    "Paste your contract or upload a PDF. ClearContract uses Claude AI to explain every clause in plain English and flag anything risky — in seconds.",
+    "Paste your contract or upload a PDF. ClearContract uses Claude AI to explain every clause in plain English and flag anything risky, in seconds.",
   alternates: {
     canonical: "https://clrct.com/app",
   },
 };
 
-// Navbar + Footer are provided by app/app/layout.tsx — don't render again here.
+// Navbar + Footer are provided by app/app/layout.tsx, don't render again here.
 export default async function AppPage() {
   const { userId } = await auth();
 
   // Look up current plan so we can badge the header and show the billing
-  // portal button for paid users. Swallow errors — DB might not be
+  // portal button for paid users. Swallow errors, DB might not be
   // provisioned in some dev/preview environments.
   let plan: "FREE" | "PRO" | "BUSINESS" = "FREE";
   let hasStripeCustomer = false;
@@ -41,10 +41,10 @@ export default async function AppPage() {
 
   const planBadge = {
     FREE: { label: "Free plan", className: "bg-white/[0.06] text-zinc-300 border-white/[0.1]" },
-    PRO: { label: "Pro", className: "bg-indigo-500/15 text-indigo-300 border-indigo-500/30" },
+    PRO: { label: "Pro", className: "bg-white/15 text-zinc-200 border-white/30" },
     BUSINESS: {
       label: "Business",
-      className: "bg-violet-500/15 text-violet-300 border-violet-500/30",
+      className: "bg-white/15 text-zinc-200 border-white/30",
     },
   }[plan];
 
@@ -55,9 +55,6 @@ export default async function AppPage() {
         <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
           <div>
             <div className="flex items-center gap-2 mb-3 flex-wrap">
-              <p className="hidden sm:block text-[11px] font-semibold text-indigo-400 uppercase tracking-widest font-mono-brand">
-                // contract_analyzer
-              </p>
               <span
                 className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${planBadge.className}`}
               >

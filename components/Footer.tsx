@@ -7,7 +7,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-start justify-between gap-8">
           <div>
             <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-6 h-6 rounded-md bg-indigo-500 flex items-center justify-center text-xs shadow-lg shadow-indigo-500/30">
+              <div className="w-6 h-6 rounded-md bg-brand-gradient flex items-center justify-center text-xs shadow-lg shadow-black/20">
                 📋
               </div>
               <span className="font-semibold text-white text-sm">ClearContract</span>
@@ -23,6 +23,14 @@ export function Footer() {
               <ul className="space-y-2 text-zinc-500">
                 <li><Link href="/app" className="hover:text-zinc-300 transition-colors">Analyzer</Link></li>
                 <li><Link href="/pricing" className="hover:text-zinc-300 transition-colors">Pricing</Link></li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-medium text-zinc-300 mb-3">Legal</p>
+              <ul className="space-y-2 text-zinc-500">
+                <li><Link href="/privacy" className="hover:text-zinc-300 transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-zinc-300 transition-colors">Terms of Service</Link></li>
+                <li><Link href="/contact" className="hover:text-zinc-300 transition-colors">Contact</Link></li>
               </ul>
             </div>
           </div>

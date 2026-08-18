@@ -24,10 +24,23 @@ export async function getOrCreateDbUser(): Promise<User> {
     throw new Error("Clerk user has no email — cannot create DB record");
   }
 
+  // A row may already exist for this email under a different clerkId — e.g.
+  // after migrating the Clerk instance from development to production, the
+  // same person gets a new Clerk user id. Re-link that row to the new id
+  // instead of failing on the unique email constraint.
+  const byEmail = await prisma.user.findUnique({ where: { email } });
+  if (byEmail) {
+    return prisma.user.update({
+      where: { id: byEmail.id },
+      data: { clerkId: userId },
+    });
+  }
+
   return prisma.user.create({
     data: {
       clerkId: userId,
       email,
+      plan: "FREE",
     },
   });
 }

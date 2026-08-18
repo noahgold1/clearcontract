@@ -119,12 +119,12 @@ export function RewriteSuggestions({
   const pendingCount = (suggestions?.length ?? 0) - acceptedCount - rejectedCount;
 
   return (
-    <div className="mt-4 bg-gradient-to-br from-indigo-500/[0.06] via-violet-500/[0.04] to-transparent border border-indigo-500/25 rounded-2xl p-6">
+    <div className="mt-4 bg-gradient-to-br from-white/10/[0.06] via-white/5/[0.04] to-transparent border border-white/25 rounded-2xl p-6">
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Sparkles className="w-4 h-4 text-indigo-400" />
-            <span className="text-[11px] font-bold text-indigo-400 uppercase tracking-widest font-mono-brand">
+            <Sparkles className="w-4 h-4 text-zinc-200" />
+            <span className="text-[11px] font-bold text-zinc-200 uppercase tracking-widest font-mono-brand">
               Business · AI Rewrite
             </span>
           </div>
@@ -133,14 +133,14 @@ export function RewriteSuggestions({
           </h3>
           <p className="text-zinc-400 text-sm mt-1 max-w-xl leading-relaxed">
             Claude proposes safer language for the highest-risk clauses. Accept or reject
-            each change, then apply — we merge the accepted edits into your contract text.
+            each change, then apply, we merge the accepted edits into your contract text.
           </p>
         </div>
         {!suggestions && !loading && (
           <button
             type="button"
             onClick={onRequest}
-            className="shrink-0 bg-indigo-500 hover:bg-indigo-400 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-all shadow-lg shadow-indigo-500/30 inline-flex items-center gap-2"
+            className="shrink-0 bg-white hover:bg-zinc-200 text-zinc-950 font-semibold px-5 py-2.5 rounded-xl text-sm transition-all shadow-lg shadow-black/20 inline-flex items-center gap-2"
           >
             <Sparkles className="w-4 h-4" />
             Generate rewrites
@@ -149,7 +149,7 @@ export function RewriteSuggestions({
       </div>
 
       {loading && (
-        <div className="mt-5 flex items-center gap-3 text-indigo-300 text-sm">
+        <div className="mt-5 flex items-center gap-3 text-zinc-200 text-sm">
           <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -164,7 +164,7 @@ export function RewriteSuggestions({
         </div>
       )}
 
-      {/* Review step — per-suggestion accept/reject */}
+      {/* Review step, per-suggestion accept/reject */}
       {suggestions && suggestions.length > 0 && !applied && (
         <>
           <div className="mt-6 space-y-4">
@@ -246,7 +246,7 @@ export function RewriteSuggestions({
 
                   <div className="pt-2 border-t border-white/[0.05]">
                     <p className="text-xs text-zinc-500 leading-relaxed">
-                      <span className="text-indigo-400 font-semibold">Why: </span>
+                      <span className="text-zinc-200 font-semibold">Why: </span>
                       {s.why}
                     </p>
                   </div>
@@ -275,7 +275,7 @@ export function RewriteSuggestions({
               type="button"
               onClick={applyChanges}
               disabled={acceptedCount === 0}
-              className="inline-flex items-center gap-2 bg-indigo-500 hover:bg-indigo-400 disabled:bg-indigo-500/20 disabled:text-indigo-300/40 text-white font-semibold text-sm px-4 py-2 rounded-lg shadow-lg shadow-indigo-500/30 disabled:shadow-none transition-all"
+              className="inline-flex items-center gap-2 bg-white hover:bg-zinc-200 disabled:bg-white/20 disabled:text-zinc-400 text-zinc-950 font-semibold text-sm px-4 py-2 rounded-lg shadow-lg shadow-black/20 disabled:shadow-none transition-all"
             >
               <Sparkles className="w-4 h-4" />
               Apply {acceptedCount || 0} {acceptedCount === 1 ? "change" : "changes"}
@@ -297,14 +297,14 @@ export function RewriteSuggestions({
                 {applied.applied.length === 1 ? "change merged" : "changes merged"} into
                 your contract text.
                 {applied.failed.length > 0 &&
-                  ` ${applied.failed.length} couldn't be auto-merged — see below.`}
+                  ` ${applied.failed.length} couldn't be auto-merged, see below.`}
               </p>
             </div>
             <div className="flex gap-2 flex-wrap">
               <button
                 type="button"
                 onClick={copyAll}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-300 hover:text-indigo-200 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/25 px-3 py-1.5 rounded-md transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-200 hover:text-white bg-white/10 hover:bg-white/20 border border-white/25 px-3 py-1.5 rounded-md transition-colors"
               >
                 {allCopied ? (
                   <>
@@ -321,7 +321,7 @@ export function RewriteSuggestions({
               <button
                 type="button"
                 onClick={download}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-300 hover:text-indigo-200 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/25 px-3 py-1.5 rounded-md transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-200 hover:text-white bg-white/10 hover:bg-white/20 border border-white/25 px-3 py-1.5 rounded-md transition-colors"
               >
                 <Download className="w-3.5 h-3.5" />
                 Download .txt
@@ -340,7 +340,7 @@ export function RewriteSuggestions({
           {applied.failed.length > 0 && (
             <div className="bg-amber-500/[0.07] border border-amber-500/30 rounded-xl p-4 text-amber-200/80 text-xs leading-relaxed">
               <p className="font-semibold text-amber-200 mb-2">
-                ⚠️ Couldn&apos;t auto-merge these — the AI&apos;s quoted text didn&apos;t
+                ⚠️ Couldn&apos;t auto-merge these, the AI&apos;s quoted text didn&apos;t
                 match your contract exactly (usually a spacing or quote-character
                 difference). Copy them in manually:
               </p>
@@ -355,13 +355,13 @@ export function RewriteSuggestions({
           <textarea
             readOnly
             value={applied.text}
-            className="w-full h-80 px-4 py-3 rounded-xl bg-[#0d0d11] border border-white/[0.07] text-sm text-zinc-200 font-mono leading-relaxed resize-vertical focus:outline-none focus:border-indigo-500/40"
+            className="w-full h-80 px-4 py-3 rounded-xl bg-[#0d0d11] border border-white/[0.07] text-sm text-zinc-200 font-mono leading-relaxed resize-vertical focus:outline-none focus:border-white/40"
           />
         </div>
       )}
 
       <p className="text-[11px] text-zinc-600 text-center pt-4">
-        Drafting suggestions — not legal advice. Have a qualified attorney review anything
+        Drafting suggestions, not legal advice. Have a qualified attorney review anything
         before you send it back to the counterparty.
       </p>
     </div>
