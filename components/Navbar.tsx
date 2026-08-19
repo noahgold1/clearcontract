@@ -16,9 +16,7 @@ export function Navbar() {
       >
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-7 h-7 rounded-lg bg-brand-gradient flex items-center justify-center text-sm shadow-lg shadow-black/20">
-            📋
-          </div>
+          <img src="/icon.svg" alt="" width={28} height={28} className="w-7 h-7 rounded-lg" />
           <span className="font-semibold text-[15px] text-white tracking-tight">
             ClearContract
           </span>

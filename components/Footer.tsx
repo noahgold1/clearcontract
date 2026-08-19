@@ -7,9 +7,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-start justify-between gap-8">
           <div>
             <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-6 h-6 rounded-md bg-brand-gradient flex items-center justify-center text-xs shadow-lg shadow-black/20">
-                📋
-              </div>
+              <img src="/icon.svg" alt="" width={24} height={24} className="w-6 h-6 rounded-md" />
               <span className="font-semibold text-white text-sm">ClearContract</span>
             </div>
             <p className="text-sm text-zinc-500 max-w-xs leading-relaxed">
