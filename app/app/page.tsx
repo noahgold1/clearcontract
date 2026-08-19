@@ -5,6 +5,7 @@ import { ContractAnalyzer } from "@/components/ContractAnalyzer";
 import { UpgradeBanner } from "@/components/UpgradeBanner";
 import { ManageBilling } from "@/components/ManageBilling";
 import { prisma } from "@/lib/db";
+import "./cc-app-theme.css";
 
 export const metadata: Metadata = {
   title: "Analyze a Contract",
@@ -40,33 +41,27 @@ export default async function AppPage() {
   }
 
   const planBadge = {
-    FREE: { label: "Free plan", className: "bg-white/[0.06] text-zinc-300 border-white/[0.1]" },
-    PRO: { label: "Pro", className: "bg-white/15 text-zinc-200 border-white/30" },
+    FREE: { label: "Free plan", className: "text-zinc-400 border-[#4A4D55]" },
+    PRO: { label: "Pro", className: "text-[#F0DE4E] border-[#F0DE4E]" },
     BUSINESS: {
       label: "Business",
-      className: "bg-white/15 text-zinc-200 border-white/30",
+      className: "text-[#F0DE4E] border-[#F0DE4E]",
     },
   }[plan];
 
   return (
-    <div className="py-12 px-5">
-      <div className="max-w-4xl mx-auto">
+    <div className="cc-app">
+      <div className="cc-mid">
         {/* Header */}
         <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <div className="flex items-center gap-2 mb-3 flex-wrap">
-              <span
-                className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${planBadge.className}`}
-              >
-                {planBadge.label}
-              </span>
-            </div>
-            <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight font-display mb-2">
-              Analyze Your Contract
+            <span className="cc-plan">{planBadge.label}</span>
+            <h1 className="cc-setup-h" style={{ marginTop: 18 }}>
+              Paste the contract.
             </h1>
-            <p className="text-zinc-500 text-sm max-w-lg">
-              Paste your contract or upload a PDF. Claude AI breaks every clause into plain
-              English, flags risks, and tells you what to watch out for.
+            <p className="cc-setup-p">
+              Every clause comes back in plain English, with the terms that take
+              something from you marked in red.
             </p>
           </div>
           {hasStripeCustomer && <ManageBilling />}
@@ -77,15 +72,20 @@ export default async function AppPage() {
           <UpgradeBanner />
         </Suspense>
 
-        {/* Disclaimer */}
-        <div className="bg-amber-500/[0.07] border border-amber-500/20 rounded-xl px-5 py-3 mb-8 flex items-start gap-3">
-          <span className="text-amber-400 mt-0.5 shrink-0 text-sm">⚠</span>
-          <p className="text-amber-200/70 text-sm">
-            <strong className="text-amber-200/90">
-              For informational purposes only. Not legal advice.
-            </strong>{" "}
-            ClearContract helps you understand contract language but is not a substitute
-            for advice from a qualified attorney.
+        {/* Notice */}
+        <div
+          style={{
+            borderLeft: "3px solid #D62E22",
+            paddingLeft: 20,
+            marginTop: 34,
+            maxWidth: "58ch",
+          }}
+        >
+          <p style={{ fontSize: 15, lineHeight: 1.6, opacity: 0.8 }}>
+            <strong>It is not a lawyer.</strong> It reads the words and tells you what
+            they mean. It does not know your situation or what else you have already
+            signed. When the contract is big enough that being wrong would cost you,
+            take it to a lawyer.
           </p>
         </div>
 
@@ -94,3 +94,4 @@ export default async function AppPage() {
     </div>
   );
 }
+

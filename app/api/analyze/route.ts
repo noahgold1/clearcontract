@@ -80,27 +80,36 @@ export async function POST(req: NextRequest) {
     }
 
     // --- Auth + plan enforcement --------------------------------------------
-    // Analysis is a metered, paid feature. Require a signed-in user and check
-    // their plan quota BEFORE spending an Anthropic call, so nobody (signed-out
-    // or over-limit) can burn the API key.
-    let dbUser;
+    // Analysis is free and open: signed-out visitors can analyse without an
+    // account. Signed-in users still go through their plan quota so paid tiers
+    // and the usage counter keep working.
+    //
+    // NOTE: with no account required there is nothing in the code metering
+    // anonymous use, and every call spends real money on the Anthropic key.
+    // Put a rate limit in front of this route (Vercel Firewall -> Rate
+    // Limiting is the no-code option) before it sees traffic.
+    let dbUser = null;
     try {
       dbUser = await getOrCreateDbUser();
     } catch {
-      return NextResponse.json(
-        { error: "Please sign in to analyze contracts.", signInRequired: true },
-        { status: 401 }
-      );
+      dbUser = null; // not signed in, carry on
     }
 
     const isPhoto = images.length > 0;
-    const usage = await checkAndIncrementUsage(dbUser.id, dbUser.plan, isPhoto ? "photo" : "analysis");
-    if (!usage.allowed) {
-      const msg =
-        usage.reason === "photo"
-          ? `You've used all ${usage.limit} photo scan${usage.limit === 1 ? "" : "s"} on your ${dbUser.plan} plan this month. Upgrade for more photo scans.`
-          : `You've used all ${usage.limit} free analyses this month. Upgrade to Pro for unlimited analyses.`;
-      return NextResponse.json({ error: msg, upgrade: true }, { status: 402 });
+
+    if (dbUser) {
+      const usage = await checkAndIncrementUsage(
+        dbUser.id,
+        dbUser.plan,
+        isPhoto ? "photo" : "analysis"
+      );
+      if (!usage.allowed) {
+        const msg =
+          usage.reason === "photo"
+            ? `You've used all ${usage.limit} photo scan${usage.limit === 1 ? "" : "s"} on your ${dbUser.plan} plan this month. Upgrade for more photo scans.`
+            : `You've used all ${usage.limit} free analyses this month. Upgrade to Pro for unlimited analyses.`;
+        return NextResponse.json({ error: msg, upgrade: true }, { status: 402 });
+      }
     }
 
     const systemPrompt = buildSystemPrompt(mode);
