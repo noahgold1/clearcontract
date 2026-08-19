@@ -11,6 +11,8 @@
    <div className="cc-root"> below.
    ============================================================================ */
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 
 const CC_CSS = `/* ClearContract landing theme.
    Every class is cc- prefixed and everything lives under .cc-root, so this
@@ -792,6 +794,7 @@ export default function Page() {
   return (
     <div className="cc-root">
       <style dangerouslySetInnerHTML={{ __html: CC_CSS }} />
+      <Navbar />
       <CcHero appHref="/app" />
       <CcRail />
       <CcWhatItDoes />
@@ -799,6 +802,7 @@ export default function Page() {
       <CcFaq />
       <CcNotice />
       <CcClosing appHref="/app" />
+      <Footer />
     </div>
   );
 }
