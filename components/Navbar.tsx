@@ -27,16 +27,6 @@ export function Navbar() {
         {/* Nav, tighter on mobile so the CTA button doesn't wrap to 2 lines. */}
         <nav className="flex items-center gap-0.5 sm:gap-1">
           <Link
-            href="/pricing"
-            className={`px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
-              pathname === "/pricing"
-                ? "text-white bg-white/10"
-                : "text-zinc-400 hover:text-white hover:bg-white/[0.06]"
-            }`}
-          >
-            Pricing
-          </Link>
-          <Link
             href="/app"
             className={`px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
               pathname === "/app"
@@ -67,7 +57,7 @@ export function Navbar() {
                 href="/app"
                 className="btn-brand ml-1 sm:ml-2 px-3 sm:px-4 py-1.5 rounded-lg text-zinc-950 text-xs sm:text-sm font-semibold whitespace-nowrap transition-all"
               >
-                Try free
+                Analyze a contract
               </Link>
             </>
           )}

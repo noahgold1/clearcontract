@@ -22,7 +22,6 @@ export function Footer() {
               <p className="font-medium text-zinc-300 mb-3">Product</p>
               <ul className="space-y-2 text-zinc-500">
                 <li><Link href="/app" className="hover:text-zinc-300 transition-colors">Analyzer</Link></li>
-                <li><Link href="/pricing" className="hover:text-zinc-300 transition-colors">Pricing</Link></li>
               </ul>
             </div>
             <div>
