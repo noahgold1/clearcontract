@@ -4,9 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { ContractCrawler } from "./ContractCrawler";
 import { ClauseCard } from "./ClauseCard";
 import { DownloadPDF } from "./DownloadPDF";
-import { RewriteSuggestions } from "./RewriteSuggestions";
 import { AUDIENCE_MODES, type AudienceMode, type ClauseResult } from "@/lib/prompts";
-import type { RewriteSuggestion } from "@/app/api/rewrite/route";
 
 /* Results are grouped by what a clause costs you rather than listed in
    document order, so the things worth acting on are the things on screen. */
@@ -67,15 +65,7 @@ export function ContractAnalyzer() {
   const [error, setError] = useState<string | null>(null);
   const [clauses, setClauses] = useState<ClauseResult[] | null>(null);
   const [filter, setFilter] = useState<FilterStatus>("all");
-  // The contract text the server actually analyzed, for paste it's what the
-  // user typed, for a PDF it's the server-extracted text. Kept so the Business
-  // rewrite feature can operate on PDF uploads, not just pasted text.
-  const [analyzedText, setAnalyzedText] = useState("");
 
-  // Rewrite feature (Business tier)
-  const [rewriteLoading, setRewriteLoading] = useState(false);
-  const [rewriteError, setRewriteError] = useState<string | null>(null);
-  const [rewrites, setRewrites] = useState<RewriteSuggestion[] | null>(null);
 
   const workingRef = useRef<HTMLDivElement>(null);
 
@@ -102,9 +92,6 @@ export function ContractAnalyzer() {
     e.preventDefault();
     setError(null);
     setClauses(null);
-    setRewrites(null);
-    setRewriteError(null);
-    setAnalyzedText("");
     setFilter("all");
     setLoading(true);
 
@@ -134,13 +121,6 @@ export function ContractAnalyzer() {
         return;
       }
       setClauses(data.clauses);
-      // Server returns the text it analyzed (extracted from the PDF when
-      // uploaded). Fall back to the pasted text. Photo/OCR input returns "".
-      setAnalyzedText(
-        typeof data.contractText === "string" && data.contractText.trim()
-          ? data.contractText
-          : text
-      );
       setTimeout(
         () => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
         100
@@ -152,39 +132,6 @@ export function ContractAnalyzer() {
     }
   }
 
-  async function handleRewrite() {
-    // Rewrite runs on the text the server analyzed. That covers pasted text and
-    // PDF uploads (the server returns the extracted text). Photo/OCR input has
-    // no client-side text, so guide the user to paste or upload a PDF instead.
-    const source = analyzedText.trim();
-    if (!source) {
-      setRewriteError(
-        "Rewrite needs the contract's text. It works on pasted contracts and PDF uploads, photo scans can't be rewritten. Paste the text or upload the PDF, then run a fresh analysis."
-      );
-      return;
-    }
-    setRewriteLoading(true);
-    setRewriteError(null);
-    setRewrites(null);
-
-    try {
-      const res = await fetch("/api/rewrite", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: source, mode }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setRewriteError(data.error ?? "Something went wrong. Please try again.");
-        return;
-      }
-      setRewrites(data.suggestions);
-    } catch {
-      setRewriteError("Network error. Check your connection and try again.");
-    } finally {
-      setRewriteLoading(false);
-    }
-  }
 
   const riskCount = clauses?.filter((c) => c.status === "risk").length ?? 0;
   const unusualCount = clauses?.filter((c) => c.status === "unusual").length ?? 0;
@@ -468,19 +415,7 @@ export function ContractAnalyzer() {
             );
           })}
 
-          {/* Business-only rewrite feature */}
-          <RewriteSuggestions
-            contractText={analyzedText || text}
-            onRequest={handleRewrite}
-            loading={rewriteLoading}
-            error={rewriteError}
-            suggestions={rewrites}
-          />
 
-          <p className="text-xs text-zinc-700 text-center pt-2">
-            For informational purposes only. Not legal advice. Consult a qualified attorney
-            for legal matters.
-          </p>
         </div>
       )}
     </div>

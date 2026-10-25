@@ -24,8 +24,7 @@ export default function TermsPage() {
               <h2 className="text-xl font-semibold text-white">1. The service</h2>
               <p className="text-zinc-400">
                 ClearContract is a web application that uses large language models to
-                read contracts and produce plain-English summaries, risk flags, and
-                rewrite suggestions. By accessing the service you agree to these terms.
+                read contracts and produce plain-English summaries and risk flags. By accessing the service you agree to these terms.
               </p>
             </section>
 

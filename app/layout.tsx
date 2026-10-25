@@ -141,7 +141,7 @@ const SITE_SCHEMA = {
       description:
         "Paste a contract, upload a PDF, or photograph the page. Every clause comes back in plain English, sorted into standard, unusual, and risk.",
       featureList: [
-        "Plain-English rewrite of every clause",
+        "Plain-English explanation of every clause",
         "Risk and unusual-language flags",
         "PDF and photograph input",
         "Reader profiles for freelancer, tenant, founder, and employment contracts",
