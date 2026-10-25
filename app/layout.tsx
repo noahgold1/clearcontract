@@ -154,6 +154,8 @@ export default function RootLayout({
       appearance={{
         variables: {
           colorPrimary: "#4BA8FF",
+          // White on this blue is ~2.6:1; night text on it is ~8:1.
+          colorTextOnPrimaryBackground: "#05080E",
           colorBackground: "#0B1522",
           colorText: "#F2F6FB",
           colorTextSecondary: "#8A97A8",
