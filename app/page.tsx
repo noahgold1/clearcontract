@@ -43,7 +43,7 @@ const CC_CSS = `/* ClearContract landing theme.
    every cc- rule below still overrides it. box-sizing is already set
    globally in globals.css, and Tailwind preflight
    already zeroes margins on headings, paragraphs and lists. */
-.cc-root a{color:inherit;text-decoration:none}
+.cc-root a:where([class^="cc-"],[class*=" cc-"],:not([class])){color:inherit;text-decoration:none}
 .cc-root ::selection{background:var(--canary);color:var(--ink)}
 .cc-root :focus-visible{outline:3px solid var(--redline);outline-offset:2px}
 .cc-reader :focus-visible,.cc-sign :focus-visible,.cc-foot :focus-visible{outline-color:var(--canary)}
@@ -99,15 +99,15 @@ a{color:inherit}
 .cc-hero{background:var(--canary);border-bottom:var(--rule);position:relative;overflow:hidden}
 .cc-hero-in{padding-top:clamp(44px,7vw,92px);padding-bottom:clamp(40px,6vw,72px);position:relative;z-index:2}
 .cc-hero .cc-tag{color:var(--ink);opacity:.72;margin-bottom:22px;display:block}
-h1{
+.cc-hero h1{
   font-family:var(--display);font-weight:800;
   font-size:clamp(46px,10.5vw,132px);line-height:.9;letter-spacing:-.035em;
   max-width:13ch;
 }
-h1 .cc-ln{display:block;overflow:hidden}
-h1 .cc-ln i{display:block;font-style:normal;transform:translateY(105%);transition:transform .82s cubic-bezier(.16,1,.3,1)}
-.cc-loaded h1 .cc-ln i{transform:translateY(0)}
-.cc-loaded h1 .cc-ln:nth-child(2) i{transition-delay:.09s}
+.cc-hero h1 .cc-ln{display:block;overflow:hidden}
+.cc-hero h1 .cc-ln i{display:block;font-style:normal;transform:translateY(105%);transition:transform .82s cubic-bezier(.16,1,.3,1)}
+.cc-hero.cc-loaded h1 .cc-ln i{transform:translateY(0)}
+.cc-hero.cc-loaded h1 .cc-ln:nth-child(2) i{transition-delay:.09s}
 .cc-hero-sub{
   font-size:clamp(17px,2.1vw,21px);max-width:46ch;margin-top:26px;line-height:1.5;
   opacity:0;transform:translateY(14px);transition:opacity .7s .34s,transform .7s .34s
