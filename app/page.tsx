@@ -35,7 +35,14 @@ const CC_CSS = `/* ClearContract landing theme.
   font-family:var(--sans); font-size:17px; line-height:1.55;
   -webkit-font-smoothing:antialiased;
 }
-.cc-root *{box-sizing:border-box;margin:0;padding:0}
+.cc-root :where([class^="cc-"],[class*=" cc-"]){margin:0;padding:0}
+/* Scoped to cc- elements on purpose. A bare .cc-root star reset also zeroes
+   margin and padding on the Tailwind Navbar and Footer nested in here, which
+   kills their mx-auto and px-5 and pins both to the left edge of the window.
+   The :where() keeps specificity at one class, same as the old reset, so
+   every cc- rule below still overrides it. box-sizing is already set
+   globally in globals.css, and Tailwind preflight
+   already zeroes margins on headings, paragraphs and lists. */
 .cc-root a{color:inherit;text-decoration:none}
 .cc-root ::selection{background:var(--canary);color:var(--ink)}
 .cc-root :focus-visible{outline:3px solid var(--redline);outline-offset:2px}
@@ -741,9 +748,28 @@ function CcWhatItDoes() {
   );
 }
 
+/**
+ * Built from the same FAQS array the section renders, so the markup Google
+ * reads and the words on the page cannot drift apart. Mismatched FAQ schema
+ * gets the rich result pulled, so this must never be hand-maintained.
+ */
+const FAQ_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQS.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+};
+
 function CcFaq() {
   return (
     <section className="cc-faq">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_SCHEMA) }}
+      />
       <div className="cc-wrap">
         <span className="cc-tag">Questions</span>
         <h2 className="cc-sec-title">The five people ask most.</h2>

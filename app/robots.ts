@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 
-const APP_URL = "https://clearcontract-two.vercel.app";
+const APP_URL = "https://clrct.com";
 
 export default function robots(): MetadataRoute.Robots {
   return {

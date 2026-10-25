@@ -5,7 +5,10 @@ import "./globals.css";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 
-const APP_URL = "https://clearcontract-two.vercel.app";
+// The canonical home of the site. Everything in the metadata below derives
+// from this, so the live domain must be the only value here — pointing it at
+// a deploy preview tells Google to index that preview instead of clrct.com.
+const APP_URL = "https://clrct.com";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -79,22 +82,16 @@ export const metadata: Metadata = {
     title: "ClearContract: Understand Any Contract in Seconds",
     description:
       "AI-powered contract analysis. Paste any contract and get a plain-English breakdown of every clause, risk flags, and actionable insights, powered by Claude AI.",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "ClearContract: AI Contract Analyzer",
-      },
-    ],
+    // No images array here on purpose. app/opengraph-image.tsx generates the
+    // card and Next wires it up automatically; listing a file as well only
+    // creates a second, wrong URL to keep in sync. There is no og-image.png.
   },
   twitter: {
     card: "summary_large_image",
     title: "ClearContract: Understand Any Contract in Seconds",
     description:
       "Paste any contract. Get plain-English explanations of every clause. Flag risks instantly. Powered by Claude AI.",
-    images: ["/og-image.png"],
-    creator: "@clearcontract",
+    // Same reasoning: X falls back to og:image, which the generated card fills.
   },
   alternates: {
     canonical: APP_URL,
@@ -103,6 +100,61 @@ export const metadata: Metadata = {
   verification: {
     google: "TgpV7EfC2D9IA_KBUkNx7yM8IRVZ9c3MHG9NdpKDEuQ",
   },
+};
+
+/**
+ * Site-wide structured data. Only claims that are true of the live product go
+ * in here: it is free, it runs in the browser, it is made by one person. No
+ * aggregateRating — there are no real reviews to point at, and inventing them
+ * is both a policy violation and a lie.
+ */
+const SITE_SCHEMA = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${APP_URL}/#website`,
+      url: APP_URL,
+      name: "ClearContract",
+      description:
+        "Reads a contract and tells you, in plain English, what each clause actually does to you.",
+      inLanguage: "en-US",
+      publisher: { "@id": `${APP_URL}/#org` },
+    },
+    {
+      "@type": "Organization",
+      "@id": `${APP_URL}/#org`,
+      name: "ClearContract",
+      url: APP_URL,
+      logo: `${APP_URL}/icon.svg`,
+      email: "support@clrct.com",
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": `${APP_URL}/#app`,
+      name: "ClearContract",
+      url: `${APP_URL}/app`,
+      applicationCategory: "BusinessApplication",
+      applicationSubCategory: "Contract analysis",
+      operatingSystem: "Any",
+      browserRequirements: "Requires JavaScript.",
+      description:
+        "Paste a contract, upload a PDF, or photograph the page. Every clause comes back in plain English, sorted into standard, unusual, and risk.",
+      featureList: [
+        "Plain-English rewrite of every clause",
+        "Risk and unusual-language flags",
+        "PDF and photograph input",
+        "Reader profiles for freelancer, tenant, founder, and employment contracts",
+        "Downloadable marked-up PDF",
+      ],
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+      publisher: { "@id": `${APP_URL}/#org` },
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -114,12 +166,16 @@ export default function RootLayout({
     <ClerkProvider
       appearance={{
         variables: {
-          colorPrimary: "#a1a1aa", // match site indigo-500
-          colorBackground: "#09090b",
-          colorText: "#fafafa",
-          colorInputBackground: "#111116",
-          colorInputText: "#fafafa",
-          borderRadius: "0.75rem",
+          // Sign-in has to belong to the same site as the rest of it:
+          // paper ground, ink type, canary for the one thing you click.
+          colorPrimary: "#16171B",
+          colorBackground: "#F5F4EF",
+          colorText: "#16171B",
+          colorTextSecondary: "#5C5F68",
+          colorInputBackground: "#FFFFFF",
+          colorInputText: "#16171B",
+          colorDanger: "#D62E22",
+          borderRadius: "0.25rem",
         },
       }}
     >
@@ -129,6 +185,11 @@ export default function RootLayout({
       >
         <head>
           <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+          <link rel="apple-touch-icon" href="/icon.svg" />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(SITE_SCHEMA) }}
+          />
         </head>
         <body className="font-sans antialiased">
           <SmoothScroll />
