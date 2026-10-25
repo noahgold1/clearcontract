@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { ContractCrawler } from "./ContractCrawler";
 import { ClauseCard } from "./ClauseCard";
 import { DownloadPDF } from "./DownloadPDF";
 import { RewriteSuggestions } from "./RewriteSuggestions";
@@ -75,6 +76,16 @@ export function ContractAnalyzer() {
   const [rewriteLoading, setRewriteLoading] = useState(false);
   const [rewriteError, setRewriteError] = useState<string | null>(null);
   const [rewrites, setRewrites] = useState<RewriteSuggestion[] | null>(null);
+
+  const workingRef = useRef<HTMLDivElement>(null);
+
+  // Bring the reading view on screen when a run starts; the button that
+  // starts it sits at the bottom of a long form.
+  useEffect(() => {
+    if (!loading) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    workingRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  }, [loading]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -201,7 +212,7 @@ export function ContractAnalyzer() {
   const inputMethodTabs: { key: InputMethod; label: string }[] = [
     { key: "paste", label: "Paste Text" },
     { key: "upload", label: "Upload PDF" },
-    { key: "photo", label: "📷 Photo" },
+    { key: "photo", label: "Photo" },
   ];
 
   const submitDisabled =
@@ -385,14 +396,22 @@ export function ContractAnalyzer() {
 
       {/* Working */}
       {loading && (
-        <div className="cc-working">
+        <div className="cc-working" ref={workingRef}>
           <span className="cc-tag" style={{ opacity: 0.55 }}>
             Reading
           </span>
           <div className="cc-work-now">Going through it clause by clause</div>
-          <div className="cc-work-bar">
-            <i />
-          </div>
+          <ContractCrawler
+            text={inputMethod === "paste" ? text : undefined}
+            imageSrc={inputMethod === "photo" ? photoPreview : null}
+            label={
+              inputMethod === "upload" && file
+                ? file.name
+                : inputMethod === "photo" && photo
+                ? photo.name
+                : "Your contract"
+            }
+          />
         </div>
       )}
 

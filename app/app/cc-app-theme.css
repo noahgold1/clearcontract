@@ -129,3 +129,54 @@
   animation:cc-slide 1.4s ease-in-out infinite}
 @keyframes cc-slide{0%{transform:translateX(-100%)}100%{transform:translateX(340%)}}
 @media(prefers-reduced-motion:reduce){.cc-work-bar i{animation:none;width:100%}}
+
+/* ============================================================
+   CRAWLER : the spider that reads while the model works
+   ============================================================ */
+.cc-crawl{margin-top:22px}
+.cc-crawl-box{
+  position:relative;overflow:hidden;height:clamp(340px,58vh,500px);
+  border:1px solid var(--ink);background:var(--bond);box-shadow:6px 6px 0 var(--ink);
+}
+.cc-crawl-box::after{ /* fade the bottom edge so the page reads as continuing */
+  content:"";position:absolute;left:0;right:0;bottom:0;height:90px;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(245,244,239,0),var(--bond) 85%);
+}
+.cc-crawl-doc{
+  position:relative;will-change:transform;
+  padding:30px clamp(18px,4vw,34px) 140px;
+  font-family:var(--legal);font-size:17px;line-height:1.85;color:rgba(22,23,27,.74);
+  white-space:pre-wrap;overflow-wrap:break-word;
+}
+.cc-crawl-w{border-radius:2px;transition:background-color .3s,box-shadow .3s,color .3s}
+.cc-crawl-w.is-touched{box-shadow:0 0 0 1.5px rgba(22,23,27,.28)}
+.cc-crawl-w.k1.is-hit{box-shadow:0 0 0 1.5px var(--ink);color:var(--ink);background:rgba(22,23,27,.05)}
+.cc-crawl-w.k2.is-hit{box-shadow:0 0 0 1.5px var(--redline);color:var(--redline-d);background:var(--canary)}
+.cc-crawl-more{font-family:var(--mono);font-size:12px;letter-spacing:.1em;opacity:.5}
+
+/* PDF stand-in page: word-shaped bars instead of text. */
+.cc-crawl-pdf{line-height:2.1;font-size:15px}
+.cc-crawl-pdf .cc-crawl-w{background:rgba(22,23,27,.12);color:transparent}
+.cc-crawl-pdf .cc-crawl-w.is-touched{background:rgba(22,23,27,.2)}
+.cc-crawl-pdf .cc-crawl-w.k1.is-hit{background:rgba(22,23,27,.55);box-shadow:none}
+.cc-crawl-pdf .cc-crawl-w.k2.is-hit{background:var(--canary);box-shadow:0 0 0 1.5px var(--redline)}
+
+.cc-crawl-image{padding:0}
+.cc-crawl-image img{display:block;width:100%;height:auto;filter:grayscale(.35) contrast(1.05)}
+
+.cc-crawl-spider{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.cc-leg{fill:none;stroke:var(--ink);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.cc-knee{fill:var(--redline)}
+.cc-tip{fill:var(--canary);stroke:var(--ink);stroke-width:1.5}
+.cc-body{fill:var(--ink)}
+.cc-eye{fill:var(--canary)}
+
+.cc-crawl-pill{
+  position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:2;
+  display:flex;gap:18px;align-items:center;white-space:nowrap;max-width:calc(100% - 24px);
+  background:var(--ink);color:var(--bond);padding:10px 18px;border-radius:999px;
+  font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;
+}
+.cc-crawl-pill b{color:var(--canary);font-weight:700}
+.cc-crawl-label{font-weight:700;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
+@media(prefers-reduced-motion:reduce){.cc-crawl-spider{display:none}.cc-crawl-w{transition:none}}
