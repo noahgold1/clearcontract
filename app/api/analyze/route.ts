@@ -147,7 +147,8 @@ export async function POST(req: NextRequest) {
     try {
       message = await anthropic.messages.create({
         model: ANTHROPIC_MODEL,
-        max_tokens: 8096,
+        // Each clause is now a sentence or two, so 15 clauses fit easily in 4k.
+        max_tokens: 4096,
         system: systemPrompt,
         messages: [{ role: "user", content: userContent }],
       });

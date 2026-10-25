@@ -175,7 +175,7 @@ export function DownloadPDF({ clauses, mode }: DownloadPDFProps) {
   return (
     <button
       onClick={handleDownload}
-      className="flex items-center gap-2 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] hover:border-white/[0.15] text-zinc-300 text-sm font-medium px-4 py-2 rounded-lg transition-all"
+      className="inline-flex items-center gap-2 rounded-full border border-[#A0C8FF]/20 bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-[#F2F6FB] transition-colors hover:border-[#4BA8FF]/60 hover:bg-[#4BA8FF]/10"
     >
       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

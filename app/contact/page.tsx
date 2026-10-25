@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#09090b]">
+    <div className="min-h-screen flex flex-col bg-[#05080E]">
       <Navbar />
       <main className="flex-1 py-20 px-5">
         <article className="max-w-3xl mx-auto">
@@ -18,18 +18,18 @@ export default function ContactPage() {
             Contact us
           </h1>
           <p className="text-zinc-400 text-lg mb-12 max-w-2xl leading-relaxed">
-            Questions about your account, billing, or how ClearContract works? We&apos;re
+            Questions about your account or how ClearContract works? We&apos;re
             happy to help.
           </p>
 
           <div className="grid sm:grid-cols-2 gap-4 mb-12">
-            <div className="bg-[#111116] border border-white/[0.07] rounded-2xl p-6">
+            <div className="bg-[#0B1522] border border-white/[0.07] rounded-2xl p-6">
               <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center mb-4">
                 <Mail className="w-5 h-5 text-zinc-200" />
               </div>
               <h2 className="text-white font-semibold mb-1.5">Support</h2>
               <p className="text-zinc-500 text-sm mb-3 leading-relaxed">
-                Bug reports, billing issues, feature requests, anything else.
+                Bug reports, feature requests, anything else.
               </p>
               <a
                 href="mailto:support@clrct.com"
@@ -39,7 +39,7 @@ export default function ContactPage() {
               </a>
             </div>
 
-            <div className="bg-[#111116] border border-white/[0.07] rounded-2xl p-6">
+            <div className="bg-[#0B1522] border border-white/[0.07] rounded-2xl p-6">
               <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center mb-4">
                 <Clock className="w-5 h-5 text-zinc-200" />
               </div>
@@ -51,7 +51,7 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="bg-[#111116] border border-white/[0.07] rounded-2xl p-6">
+          <div className="bg-[#0B1522] border border-white/[0.07] rounded-2xl p-6">
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
                 <Shield className="w-5 h-5 text-zinc-200" />

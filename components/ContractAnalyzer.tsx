@@ -12,19 +12,19 @@ const TIERS = [
   {
     key: "risk" as const,
     label: "Risk",
-    blurb: "These cost you money, work, or rights.",
+    blurb: "Takes something from you.",
     badge: "text-[#FF7A6B] border-[#FF7A6B]",
   },
   {
     key: "unusual" as const,
     label: "Unusual",
-    blurb: "Not standard. Worth reading twice.",
+    blurb: "Not what you'd normally see.",
     badge: "text-[#F0DE4E] border-[#F0DE4E]",
   },
   {
     key: "standard" as const,
     label: "Standard",
-    blurb: "Ordinary language. Nothing to do here.",
+    blurb: "Ordinary. Move on.",
     badge: "text-[#8B8E96] border-[#4A4D55]",
   },
 ];
@@ -64,6 +64,8 @@ export function ContractAnalyzer() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [clauses, setClauses] = useState<ClauseResult[] | null>(null);
+  // How long the contract was going in, for the "N words to M" line.
+  const [sourceWords, setSourceWords] = useState(0);
   const [filter, setFilter] = useState<FilterStatus>("all");
 
 
@@ -121,6 +123,9 @@ export function ContractAnalyzer() {
         return;
       }
       setClauses(data.clauses);
+      const source =
+        typeof data.contractText === "string" && data.contractText.trim() ? data.contractText : text;
+      setSourceWords(source.trim() ? source.trim().split(/\s+/).length : 0);
       setTimeout(
         () => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
         100
@@ -162,6 +167,11 @@ export function ContractAnalyzer() {
     { key: "photo", label: "Photo" },
   ];
 
+  const shrunkWords = (clauses ?? []).reduce(
+    (n, c) => n + c.plain.split(/\s+/).length + (c.flag ? c.flag.split(/\s+/).length : 0),
+    0
+  );
+
   const submitDisabled =
     loading ||
     (inputMethod === "paste"
@@ -176,7 +186,7 @@ export function ContractAnalyzer() {
       <form onSubmit={handleSubmit}>
         {/* Mode selector */}
         <div className="cc-block">
-          <span className="cc-tag cc-block-lab">Who is reading it</span>
+          <span className="cc-block-lab">Reading as</span>
           <div className="cc-lenses" role="tablist" aria-label="Reader">
             {(
               Object.entries(AUDIENCE_MODES) as [
@@ -200,7 +210,6 @@ export function ContractAnalyzer() {
 
         {/* Input method */}
         <div className="cc-block">
-          <span className="cc-tag cc-block-lab">How you want to give it to us</span>
           <div className="cc-modes" role="tablist" aria-label="Input method">
             {inputMethodTabs.map(({ key, label }) => (
               <button
@@ -221,7 +230,7 @@ export function ContractAnalyzer() {
               <textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="Paste the whole thing here. Section headings help, but it will work without them."
+                placeholder="Paste the whole contract here."
               />
               <div className="cc-sheet-foot">
                 {charCount > 0 && <span>{wordCount.toLocaleString()} words</span>}
@@ -231,73 +240,72 @@ export function ContractAnalyzer() {
 
           {inputMethod === "upload" && (
             <div
+              role="button"
+              tabIndex={0}
               onClick={() => fileInputRef.current?.click()}
-              className="border border-dashed border-white/[0.1] rounded-xl p-10 text-center cursor-pointer hover:border-white/40 hover:bg-white/[0.03] transition-all"
+              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), fileInputRef.current?.click())}
+              className="cc-drop"
             >
               <input
                 ref={fileInputRef}
                 type="file"
                 accept=".pdf"
-                className="hidden"
+                hidden
                 onChange={(e) => setFile(e.target.files?.[0] ?? null)}
               />
               {file ? (
-                <div className="space-y-1.5">
-                  <div className="text-3xl">📄</div>
-                  <p className="font-medium text-zinc-200 text-sm">{file.name}</p>
-                  <p className="text-zinc-600 text-xs">
-                    {(file.size / 1024).toFixed(1)} KB ·{" "}
+                <>
+                  <p className="cc-drop-t">{file.name}</p>
+                  <p className="cc-drop-s">
+                    {(file.size / 1024).toFixed(0)} KB{" "}
                     <button
                       type="button"
+                      className="cc-drop-x"
                       onClick={(e) => {
                         e.stopPropagation();
                         setFile(null);
                         if (fileInputRef.current) fileInputRef.current.value = "";
                       }}
-                      className="text-red-400 hover:text-red-300 transition-colors"
                     >
                       Remove
                     </button>
                   </p>
-                </div>
+                </>
               ) : (
-                <div className="space-y-2">
-                  <div className="text-3xl">⬆️</div>
-                  <p className="font-medium text-zinc-400 text-sm">Click to upload a PDF</p>
-                  <p className="text-zinc-600 text-xs">PDF files only · Max 10MB</p>
-                </div>
+                <>
+                  <p className="cc-drop-t">Choose a PDF</p>
+                  <p className="cc-drop-s">Up to 10 MB</p>
+                </>
               )}
             </div>
           )}
 
           {inputMethod === "photo" && (
             <div
+              role="button"
+              tabIndex={0}
               onClick={() => photoInputRef.current?.click()}
-              className="border border-dashed border-white/[0.1] rounded-xl p-10 text-center cursor-pointer hover:border-white/40 hover:bg-white/[0.03] transition-all"
+              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), photoInputRef.current?.click())}
+              className="cc-drop"
             >
               <input
                 ref={photoInputRef}
                 type="file"
                 accept="image/*"
-                // `capture="environment"` hints mobile browsers to open the
-                // rear camera directly. Desktop browsers ignore it and open
-                // the standard file picker.
+                // Opens the rear camera on phones; desktops show a file picker.
                 capture="environment"
-                className="hidden"
+                hidden
                 onChange={handlePhotoChange}
               />
               {photo && photoPreview ? (
-                <div className="space-y-3">
+                <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={photoPreview}
-                    alt="Contract preview"
-                    className="max-h-64 mx-auto rounded-lg border border-white/[0.07]"
-                  />
-                  <p className="text-zinc-500 text-xs">
-                    {photo.name} · {(photo.size / 1024).toFixed(1)} KB ·{" "}
+                  <img src={photoPreview} alt="The contract photo you chose" className="cc-drop-img" />
+                  <p className="cc-drop-s">
+                    {photo.name}{" "}
                     <button
                       type="button"
+                      className="cc-drop-x"
                       onClick={(e) => {
                         e.stopPropagation();
                         setPhoto(null);
@@ -305,20 +313,16 @@ export function ContractAnalyzer() {
                         setPhotoPreview(null);
                         if (photoInputRef.current) photoInputRef.current.value = "";
                       }}
-                      className="text-red-400 hover:text-red-300 transition-colors"
                     >
                       Remove
                     </button>
                   </p>
-                </div>
+                </>
               ) : (
-                <div className="space-y-2">
-                  <div className="text-3xl">📸</div>
-                  <p className="font-medium text-zinc-400 text-sm">Take or upload a photo</p>
-                  <p className="text-zinc-600 text-xs">
-                    JPG, PNG, WEBP · Max 10MB · Make sure the text is legible
-                  </p>
-                </div>
+                <>
+                  <p className="cc-drop-t">Take or choose a photo</p>
+                  <p className="cc-drop-s">Keep the whole page in frame and the text sharp</p>
+                </>
               )}
             </div>
           )}
@@ -327,10 +331,8 @@ export function ContractAnalyzer() {
         {/* Submit */}
         <div className="cc-actions">
           <button type="submit" disabled={submitDisabled} className="cc-btn">
-            {loading ? "Reading it…" : "Read it"}
-            {!loading && <span className="cc-ar">&rarr;</span>}
+            {loading ? "Analyzing…" : "Analyze"}
           </button>
-          <span className="cc-note-small">Not legal advice.</span>
         </div>
       </form>
 
@@ -344,10 +346,7 @@ export function ContractAnalyzer() {
       {/* Working */}
       {loading && (
         <div className="cc-working" ref={workingRef}>
-          <span className="cc-tag" style={{ opacity: 0.55 }}>
-            Reading
-          </span>
-          <div className="cc-work-now">Going through it clause by clause</div>
+          <div className="cc-work-now">Reading every clause</div>
           <ContractCrawler
             text={inputMethod === "paste" ? text : undefined}
             imageSrc={inputMethod === "photo" ? photoPreview : null}
@@ -367,9 +366,14 @@ export function ContractAnalyzer() {
         <div ref={resultsRef}>
           {/* Verdict: the answer before the evidence */}
           <div className="cc-verdict">
-            <span className="cc-tag cc-v-meta">
-              {clauses.length} clauses &nbsp;/&nbsp; {AUDIENCE_MODES[mode].label}
-            </span>
+            <p className="cc-v-meta">
+              {sourceWords > 0 && shrunkWords < sourceWords && (
+                <span className="cc-shrunk">
+                  {sourceWords.toLocaleString()} words <b>to {shrunkWords.toLocaleString()}</b>
+                </span>
+              )}
+              <span>{clauses.length} clauses, read as {AUDIENCE_MODES[mode].label.toLowerCase()}</span>
+            </p>
             <h2 className="cc-v-head">
               {riskCount > 0 ? (
                 <>

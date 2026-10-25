@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Baloo_2, JetBrains_Mono, Playfair_Display } from "next/font/google";
+import { Manrope, Azeret_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
@@ -10,34 +10,21 @@ import { ScrollProgress } from "@/components/ui/scroll-progress";
 // a deploy preview tells Google to index that preview instead of clrct.com.
 const APP_URL = "https://clrct.com";
 
-const inter = Inter({
+// One family for everything, set at different weights, plus a mono that is
+// only used for numbers (word counts, the reading counter). Both are on
+// Google Fonts and self-hosted by next/font, so there is no layout shift.
+const manrope = Manrope({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-sans",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const baloo = Baloo_2({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-display",
-  weight: ["600", "700", "800"],
-});
-
-const mono = JetBrains_Mono({
+const azeret = Azeret_Mono({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-mono",
-  weight: ["400", "500", "600"],
-});
-
-// Display accent for the hero headline, used italic.
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-serif",
-  style: ["normal", "italic"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500"],
 });
 
 export const metadata: Metadata = {
@@ -166,22 +153,22 @@ export default function RootLayout({
     <ClerkProvider
       appearance={{
         variables: {
-          // Sign-in has to belong to the same site as the rest of it:
-          // paper ground, ink type, canary for the one thing you click.
-          colorPrimary: "#16171B",
-          colorBackground: "#F5F4EF",
-          colorText: "#16171B",
-          colorTextSecondary: "#5C5F68",
-          colorInputBackground: "#FFFFFF",
-          colorInputText: "#16171B",
-          colorDanger: "#D62E22",
-          borderRadius: "0.25rem",
+          colorPrimary: "#4BA8FF",
+          colorBackground: "#0B1522",
+          colorText: "#F2F6FB",
+          colorTextSecondary: "#8A97A8",
+          colorInputBackground: "#05080E",
+          colorInputText: "#F2F6FB",
+          colorDanger: "#FF8A7A",
+          colorNeutral: "#F2F6FB",
+          fontFamily: "var(--font-sans), system-ui, sans-serif",
+          borderRadius: "12px",
         },
       }}
     >
       <html
         lang="en"
-        className={`${inter.variable} ${baloo.variable} ${mono.variable} ${playfair.variable}`}
+        className={`${manrope.variable} ${azeret.variable}`}
       >
         <head>
           <link rel="icon" href="/icon.svg" type="image/svg+xml" />

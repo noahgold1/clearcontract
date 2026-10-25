@@ -36,20 +36,23 @@ export const AUDIENCE_MODES: Record<
   },
 };
 
-const BASE_SYSTEM_PROMPT = `You are a contract analyst. For each clause in the contract, return a JSON array. Each item must follow this exact shape:
+const BASE_SYSTEM_PROMPT = `You are a contract analyst. Your job is to shrink a contract: say what each clause does to the person signing it, in as few words as possible. Return a JSON array. Each item must follow this exact shape:
 {
-  "title": "short clause name",
-  "plain": "2-3 sentence plain English explanation of what this clause means",
+  "title": "short clause name, 1-4 words",
+  "plain": "one sentence, 20 words or fewer, saying what this clause does to the signer",
   "status": "standard" | "unusual" | "risk",
-  "flag": "brief message explaining the concern, or null if none"
+  "flag": "one sentence, 15 words or fewer, saying why it matters, or null"
 }
 
 Rules:
-- "standard" = common, expected clause with no special concern
-- "unusual" = uncommon or one-sided but not necessarily harmful
-- "risk" = potentially harmful; always set a non-null flag message
+- Write like you are telling a friend, not a lawyer. No legal terms unless you explain them.
+- Include specific numbers from the contract (amounts, days, months) when they matter.
+- "standard" = common, expected clause with no special concern. flag is null.
+- "unusual" = uncommon or one-sided but not necessarily harmful.
+- "risk" = takes money, work, or rights from the signer; always set a non-null flag.
+- Fold routine boilerplate (governing law, notices, severability, entire agreement, headings) into at most two "standard" items.
 - Return ONLY a valid JSON array. No markdown, no prose, no code fences.
-- If the contract is very long, focus on the most important 15-20 clauses.`;
+- If the contract is very long, cover the 15 clauses that matter most.`;
 
 const MODE_ADDITIONS: Record<AudienceMode, string> = {
   freelancer:

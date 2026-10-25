@@ -4,42 +4,32 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SignInButton, UserButton, useAuth } from "@clerk/nextjs";
 
+/* Transparent over the night background, blurred once content scrolls
+   under it. The one filled shape is the pill that starts an analysis. */
 export function Navbar() {
   const pathname = usePathname();
   const { isLoaded, isSignedIn } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#16171B] bg-[#F5F4EF]">
-      <div
-        className="max-w-6xl mx-auto px-5 flex items-center justify-between"
-        style={{ height: "60px" }}
-      >
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <img src="/icon.svg" alt="" width={28} height={28} className="w-7 h-7 rounded-lg" />
-          <span className="font-semibold text-[15px] text-[#16171B] tracking-tight">
-            ClearContract
-          </span>
+    <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#05080E]/70 backdrop-blur-xl">
+      <div className="max-w-6xl mx-auto px-5 flex items-center justify-between h-16">
+        <Link href="/" className="flex items-center gap-2.5 rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4BA8FF]">
+          <img src="/icon.svg" alt="" width={28} height={28} className="w-7 h-7" />
+          <span className="text-[15px] font-medium tracking-tight text-[#F2F6FB]">ClearContract</span>
         </Link>
 
-        {/* Nav, tighter on mobile so the CTA button doesn't wrap to 2 lines. */}
-        <nav className="flex items-center gap-0.5 sm:gap-1">
+        <nav className="flex items-center gap-1 sm:gap-2">
           <Link
             href="/app"
-            className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors ${
-              pathname === "/app"
-                ? "text-[#16171B] bg-[#E6E4DB]"
-                : "text-[#16171B]/60 hover:text-[#16171B] hover:bg-[#E6E4DB]"
+            className={`hidden sm:inline-flex px-3 py-2 text-sm rounded-full transition-colors ${
+              pathname === "/app" ? "text-[#F2F6FB]" : "text-[#F2F6FB]/55 hover:text-[#F2F6FB]"
             }`}
           >
             Analyzer
           </Link>
 
-          {/* Auth UI, switch between avatar menu and sign-in/CTA based on
-              client-side auth state. Render nothing until Clerk is loaded to
-              avoid a flicker between states. */}
           {isLoaded && isSignedIn && (
-            <div className="ml-1 sm:ml-2 flex items-center">
+            <div className="ml-1 flex items-center">
               <UserButton appearance={{ elements: { avatarBox: "w-8 h-8" } }} />
             </div>
           )}
@@ -47,16 +37,18 @@ export function Navbar() {
           {isLoaded && !isSignedIn && (
             <>
               <SignInButton mode="modal">
-                <button className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium text-[#16171B]/60 hover:text-[#16171B] hover:bg-[#E6E4DB] transition-colors">
+                <button className="px-3 py-2 text-sm rounded-full text-[#F2F6FB]/55 hover:text-[#F2F6FB] transition-colors">
                   Sign in
                 </button>
               </SignInButton>
-              <Link
-                href="/app"
-                className="ml-1 sm:ml-2 px-3 sm:px-4 py-2 border border-[#16171B] bg-[#16171B] text-[#F5F4EF] text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors hover:bg-[#D62E22] hover:border-[#D62E22]"
-              >
-                Analyze a contract
-              </Link>
+              {pathname !== "/app" && (
+                <Link
+                  href="/app"
+                  className="ml-1 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap text-[#F2F6FB] bg-[#4BA8FF]/[0.12] border border-[#4BA8FF]/40 hover:bg-[#4BA8FF]/[0.22] hover:border-[#4BA8FF]/70 transition-colors"
+                >
+                  Analyze a contract
+                </Link>
+              )}
             </>
           )}
         </nav>
